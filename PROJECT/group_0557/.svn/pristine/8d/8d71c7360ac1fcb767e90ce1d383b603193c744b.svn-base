@@ -1,0 +1,22 @@
+Categories,,
+AShirts,31000000
+BShirts,31000001
+CShirts,31000002
+DShirts,31000003
+EShirts,31000006
+Cities,,
+Alabama,true
+Toronto,true
+Mexico,false,<Alabama:501!Toronto:97>
+Products,,
+31000001,hotel1.jpg,Shirt-A-Flo,This is a groovy AF shirt,12.5,71000000,<Toronto:995>
+31000003,hotel1.jpg,Shirt-A-Blo,,12.5,51000000,<Toronto:10968!Alabama:0>
+Users,,
+false,Lynn,password,Mexico,92 What's it road,10000001,<>
+true,George,password,Mexico,92 What's it road,10102142
+Invoices,,
+1,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&!71000000:&5.0#12.5&>
+2,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+3,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+4,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+511,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>

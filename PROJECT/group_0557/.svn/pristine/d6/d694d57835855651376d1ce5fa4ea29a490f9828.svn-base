@@ -1,0 +1,136 @@
+package finalproject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+/**
+ * Represents an invoice for a successfully placed order by a shopper in the store.
+ */
+public class Invoice {
+	private static int InvoiceIDgenerator = 1;
+	HashMap<Product, double[]> purchaseList; // value is [quantity, price per item]
+	private int totalItems, invoiceID;
+	private String shopperID;
+	private double itemsCost, shippingCost;
+	private City center;
+	private ArrayList<String> deliveryRoute; // City names from dist center to customer
+	
+	/**
+	 * Method to build an invoice from CSV
+	 * @param legacyCart
+	 */
+	public Invoice(int items, int InvoiceID, String shopperID, double itemsCost, double shippingCost,
+			ArrayList<String> deliveryRoute, HashMap<Product, double[]> legacyCart) {
+		this.totalItems= items;
+		this.invoiceID = InvoiceID;
+		this.shopperID = shopperID;
+		this.itemsCost = itemsCost;
+		this.shippingCost = shippingCost;
+		this.deliveryRoute = deliveryRoute;
+		this.purchaseList = legacyCart;
+		if (InvoiceID >= InvoiceIDgenerator) InvoiceIDgenerator = InvoiceID + 1;
+	}
+
+	public double getItemsCost() {
+		return itemsCost;
+	}
+
+	public double getShippingCost() {
+		return shippingCost;
+	}
+
+	public String getShopperID() {
+		return shopperID;
+	}
+
+	/**
+	 * Method to build an invoice from a live purchase.
+	 * @param cart
+	 * @param shopper
+	 * @throws IOException 
+	 */
+	public Invoice(HashMap<Product, Integer> cart, Shopper shopper) throws IOException {
+		// First we build up the items in the purchase list
+		purchaseList = new HashMap<Product, double[]>();
+		for (Product p : cart.keySet()) {
+			double[] quantityAndPrice = {(double)cart.get(p), p.getPrice()};
+			purchaseList.put(p, quantityAndPrice);
+			totalItems += (int) quantityAndPrice[0];
+			itemsCost += quantityAndPrice[0]*quantityAndPrice[1];			
+		}
+		// Next we determine the shipping center to ship from
+		ArrayList<City> route = Store.graph.getShortestRoute(shopper.getCity());
+		center = route.get(0);
+		// Remove quantity from distribution centers now
+		for (Product p : purchaseList.keySet())
+		{
+			int toFulfill = (int) purchaseList.get(p)[0];
+			int centerStock = p.getStock().get(center);
+			// First we check our fulfillment center
+			if (centerStock >= toFulfill) {
+				p.setStockandUpdateViaCheckout(center, centerStock - toFulfill);;
+			// Fulfillment center does not have enough of this product
+			} else {
+				// First we deplete that center
+				toFulfill -= centerStock;
+				p.setStockandUpdateViaCheckout(center, 0);
+				// Second we arbitrarily take stock from other centers until fulfilled
+				for (City d : Store.graph.getDistributionCenters())
+				{
+					if (!d.equals(center))
+					{
+						int distStock = p.getStock().get(d);
+						if (distStock >= toFulfill) {
+							p.setStockandUpdateViaCheckout(d, distStock - toFulfill);
+							break;
+						} else
+						{
+							if (distStock > 0) {
+								toFulfill -= distStock;
+								p.setStockandUpdateViaCheckout(d, 0);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		
+		deliveryRoute = new ArrayList<String>();	
+		for (City c : route) {
+			deliveryRoute.add(c.getName());			
+		}
+		shippingCost = Store.graph.getShortestRouteCost(shopper.getCity());
+		this.shopperID = shopper.getUserName();
+		this.invoiceID = InvoiceIDgenerator;
+		// TODO should Store handle this number?
+		InvoiceIDgenerator++;
+	}
+	
+	public ArrayList<String> getDeliveryRoute() {
+		return deliveryRoute;		
+	}
+
+	public int getInvoiceID() {
+		return invoiceID;
+	}
+
+	public String toString() {
+		String output = "Invoice #" + invoiceID + "\n";
+		output += "Quantity, Price, Item\n";
+		for (Product p : purchaseList.keySet()) {
+			output += purchaseList.get(p)[0] + ",   $" + ((double)purchaseList.get(p)[1]) + ", " + p.getName() + "\n";			
+		}
+		output += "Items purchased: " + totalItems + "\n";
+		output += "Shipping route: " + deliveryRoute + "\n";
+		output+= "Shipping cost: $" + shippingCost + "\n";
+		output += "Total price: $" + (itemsCost + shippingCost);
+		output += "\n";
+		return output;
+	}
+
+	public HashMap<Product, double[]> getPurchaseList() {
+		return purchaseList;
+	}
+}

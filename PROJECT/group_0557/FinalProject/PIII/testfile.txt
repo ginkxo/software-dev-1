@@ -1,0 +1,27 @@
+Categories,,
+Shirts,31000000
+Pants,31000001
+Hats,31000002
+Shoes,40000000
+Cities,,
+Alabama,true
+Toronto,true
+Mexico,false,<Alabama:501!Toronto:97>
+Products,,
+31000002,Cap.jpg,Shirt-A-Flo,This is a groovy AF shirt,12.5,71000000,<Toronto:995>
+31000001,Pants.jpg,Shirt-A-Blo,,12.5,51000000,<Toronto:10963!Alabama:80>
+31000001,Blue_Shorts.jpg,blue bottoms,I Love This,99999.0,71000002,<Toronto:20!Alabama:0>
+31000002,pants1.jpg,Rarest pepe,DIS IZ DA RAREST MEME,8.88,71000003,<Toronto:51!Alabama:5>
+31000001,pants1.jpg,another damn pair o pants,a fashion statement at a scandalous price.,776.0,71000004,<Toronto:0!Alabama:0>
+31000001,Pokemon_Tshirt.jpg,Gotta catch em all,better not be another drowzee,5.0,71000005,<Toronto:0!Alabama:0>
+40000000,Cap.jpg,Shoes for idiots,anything can be a shoe if you believe,1.0,71000006,<Toronto:0!Alabama:0>
+Users,,
+false,Lynn,password,Mexico,92 What's it road,10000001,<71000003:50!51000000:5>
+true,George,password,10102142
+Invoices,,
+1,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&!71000000:&5.0#12.5&>
+2,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+3,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+4,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+511,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+512,Lynn,0.97,<Toronto!Mexico>,<51000000:&5.0#12.5&>

@@ -1,0 +1,542 @@
+package finalproject;
+
+import java.io.*;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.nio.file.Files;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class DBManager {
+	private int NextUserID, NextProductID, NextCategoryID; // max <type>ID parsed + 1 - send these numbers to Store once done parsing.
+	private File CSVpath; // The location of the file we will read and write to
+    private File updates; // This file will be used as a temp-memory when writing back to CSVPath; initially empty
+
+	// These are just a thought so that we don't have to search for where to add stuff to each time,
+	// But that 'efficient' method would make us more prone to messing up our file so feel free
+	// to delete these if you think they're dangerous / unnecessary.
+	private int CategoryLocation; // The line in the CSV storing the list of categories
+	private int EndofUsers; //The line in the CSV that new users should be inserted at
+	private int EndofProducts; // The line in the CSV that new products should be inserted at
+
+	
+	DBManager(String CSVpath) {
+	    this.CSVpath = new File(CSVpath);
+        this.updates = new File("updates.csv"); //TODO:fix this path
+	}
+
+
+		
+	// Made some private parse methods below that will be called by the more
+	// encompassing methods parseUsers etc just to break the code up.
+
+    // ******************************************************************************************************
+    // *																									*
+    // *  Below here are methods for WRITING purposes. Info is sent from store to update our permanent DB.  *
+    // *																									*
+    // ******************************************************************************************************
+
+	/**
+	 * 
+	 * @param line -> a CSV line that contains information pertaining to a single user.
+	 * @return User -> The User object parsed from the CSV information
+	 */	
+	private User parseUser(String line) {
+		//TODO if ... return Administrator(...), else return Shopper(...)
+		// Will likely use constructors like the following to create the user:
+		// public Shopper(String userName, String password, City city, String address, int UserID, HashMap<Product, Integer> cart)
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param line -> a CSV line that contains all information pertaining to a single product.
+	 * @return User -> The Product object parsed from the CSV information
+	 */
+	private Product parseProduct(String line) {
+		//TODO
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param line -> a CSV line that contains all information pertaining to a single product.
+	 * @return User -> The Product object parsed from the CSV information
+	 */
+	private ArrayList<Category> parseCategory(String line) {
+		//TODO
+		return null;
+	}
+	
+	private Graph parseGraph(String line) {
+	// TODO We will need to recreate our graph of cities and connections from the file as well.
+	// Note: Graph just holds an ArrayList of cities, then the connections are stored in the city variables.
+	// So we can put a city on each line and then just make sure our graph knows all of them
+		return null;
+	}
+	    
+	/**
+	 * Returns the current list of users
+	 * @param
+	 * @throws FileNotFoundException 
+	 */
+	public HashMap<String, User> loadUsers(HashMap<String, City> cityList, HashMap<Integer, Product> productList) throws FileNotFoundException {
+		// form: UserAdmin(true or false),Username,Password,City(city),Address,UserID,Cart<ProductID:quantity!etc>
+        HashMap<String, User> listOfUsers = new HashMap<String,User>();
+        HashMap<Shopper, String> userCarts = new HashMap<Shopper, String>();
+        Scanner scanner = new Scanner(CSVpath);
+        scanner.next("Categories,,");
+        scanner.nextLine();
+        while(!scanner.hasNext("Users,,")) {
+            scanner.nextLine();
+        }
+        scanner.nextLine();
+        while(scanner.hasNext()) {
+            String[] userInformation = scanner.nextLine().split(",");
+            boolean isAdmin = Boolean.parseBoolean(userInformation[0]);
+            if (!isAdmin) {
+                Shopper s = new Shopper(
+                        userInformation[1],
+                        userInformation[2],
+                        Store.graph.cityFromString(userInformation[3]),
+                        userInformation[4],
+                        Integer.parseInt(userInformation[5]),
+                        new HashMap<Product,Integer>()
+                );
+                userCarts.put(s, userInformation[6]);
+                listOfUsers.put(s.getUsername(), s);
+            } else {
+                Administrator a = new Administrator(
+                        userInformation[1],
+                        userInformation[2]
+                );
+                listOfUsers.put(a.getUserName(), a);
+            }
+        }
+        scanner.close();
+
+        //TODO: associate user carts with the users, similar to what we do with cities
+        Iterator it = userCarts.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry) it.next();
+            Shopper currentShopper = (Shopper) pair.getKey();
+            String stringCart = (String) pair.getValue();
+            String[] itemCart = stringCart.replaceAll("<|>","").split("!");
+            for (int i = 0; i<itemCart.length; i++) {
+                String[] splitter = itemCart[i].split(":");
+                //currentShopper.cart.put(productList.get(splitter[0]),Integer.valueOf(splitter[1]));
+                currentShopper.addToCart(productList.get(Integer.valueOf(splitter[0])),Integer.valueOf(splitter[1]));
+            }
+        }
+		return listOfUsers;
+	}
+
+	/**
+	 * Returns the current list of products
+	 * @param
+	 * @throws FileNotFoundException 
+	 */
+	public HashMap<Integer, Product> loadProducts() throws FileNotFoundException { //TODO why input param?
+		//TODO start at a key for a product token, return a hashmap of all the products until the end token
+        HashMap<Integer,Product> listOfProducts = new HashMap<Integer,Product>();
+        // form: CategoryID,ProductImage,ProductName,ProductDescription,DoublePrice,IntProductID
+        // TODO where is ProductID? The hashmap has to map ID to product, rather than name.
+        Scanner scanner = new Scanner(this.CSVpath);
+        scanner.next("Categories,,");
+        scanner.nextLine();
+        while(!scanner.hasNext("Products,,")) {
+            scanner.nextLine();
+        }
+        scanner.nextLine();
+        while(!scanner.hasNext("Users,,")) {
+            String[] productInformation = scanner.nextLine().split(",");
+            Product p = new Product(
+                    Integer.parseInt(productInformation[0]),
+                    productInformation[1],
+                    productInformation[2],
+                    productInformation[3],
+                    Double.parseDouble(productInformation[4]),
+                    Integer.parseInt(productInformation[5])
+            );
+            // Parse together all quantities at all distribution centers for the product.
+            int currentPos = 6;
+            while (productInformation.length > currentPos) { //test for fencepost error
+            	City center = Store.graph.cityFromString(productInformation[currentPos]);
+            	int quantity = Integer.parseInt(productInformation[currentPos + 1]);
+            	System.out.println(center.getName() + " has " + quantity);
+            	p.addDistributionCenter(center);
+            	p.setStock(center, quantity);
+            	currentPos += 2;
+            }
+            //TODO must build up stock HashMap<City, Integer> from remaining data in line
+            //Index position [6] onward of form cityname,quantity,cityname,quantity,... until done?
+            listOfProducts.put(p.getProductID(),p);
+        }
+        scanner.close();
+        return listOfProducts;
+	}
+
+    /**
+     * loads the categories from the database
+     * @return categoryList - the list of categories in the database
+     * @throws FileNotFoundException 
+     */
+    public HashMap<Integer, Category> loadCategories() throws FileNotFoundException {
+    	// * Changed from type String to type Category
+    	// form: CategoryName,CategoryID
+        HashMap<Integer, Category> categoryList = new HashMap<Integer, Category>();
+        Scanner scanner = new Scanner(this.CSVpath);
+        scanner.next("Categories,,");
+        scanner.nextLine();
+        while (!scanner.hasNext("Cities,,")) {
+            String[] catInformation = scanner.nextLine().split(",");
+            int ID = Integer.parseInt(catInformation[1]);
+            categoryList.put(ID, new Category(catInformation[0],ID));
+        }
+        scanner.close();
+        return categoryList;
+    }
+
+    public Graph loadCities() throws FileNotFoundException {
+    	Graph cityMap = new Graph();
+//    	HashMap<String, City> cityMap = new HashMap<String, City>();
+        HashMap<City, String> cityConnectionString = new HashMap<City,String>();
+        // form: CityName,DistributionBoolean,<city1:int!city2:int!city3:int>
+        Scanner scanner = new Scanner(this.CSVpath);
+        scanner.next("Categories,,");
+        scanner.nextLine();
+        while(!scanner.hasNext("Cities,,")) {
+            scanner.nextLine();
+        }
+        scanner.nextLine();
+        while(!scanner.hasNext("Products,,")) {
+            String[] cityInformation = scanner.nextLine().split(",");
+            City city = new City(cityInformation[0],Boolean.parseBoolean(cityInformation[1]));
+            cityMap.addCity(city);
+            if (cityInformation.length > 2) {cityConnectionString.put(city,cityInformation[2]);}
+        }
+
+        scanner.close();
+
+        // using the Iterator, we will iterate through the keys of cityConnectionString
+        // at each point here, we break apart the assigned string and define the city's adjacent conns as following:
+            // blahblah.put(cityMap.get("cityname"), "string's integer converted to int")
+
+        Iterator it = cityConnectionString.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry) it.next();
+            City currentCity = (City) pair.getKey();
+            String stringCities = (String) pair.getValue();
+            String[] adjCitiesString = stringCities.replaceAll("<|>","").split("!");
+            for (int i = 0; i<adjCitiesString.length; i++) {
+                String[] splitter = adjCitiesString[i].split(":");
+                cityMap.addEdge(currentCity,  cityMap.cityFromString(splitter[0]), Integer.valueOf(splitter[1]));
+            }
+        }
+
+        return cityMap;
+    }
+    
+    // ******************************************************************************************************
+    // *																									*
+    // *  Below here are methods for WRITING purposes. Info is sent from store to update our permanent DB.  *
+    // *																									*
+    // ******************************************************************************************************
+
+    /**
+	 * Updates the stored information about an existing user.
+     * CONDITION: ALL USER IDS MUST BE UNIQUE AND ESSENTIALLY LONG INTEGERS OF RANDOM VALUES FOR THIS TO WORK?
+	 * @param user
+	 */
+	void updateUser(User user) throws IOException {
+		//TODO searches for the user matching the user information, and overwrites line
+        String newUserData = createUserData(user);
+        // search and replace
+        String userID = Integer.toString(user.getUserID());
+        replacement(userID, newUserData);
+
+	}
+
+    private String createUserData(User user) {
+        ArrayList<String> cartStorage = new ArrayList<String>();
+        String userData = user.getUserName()+","+user.getPassword();
+        if (user instanceof Administrator) {
+            String adminData = "true,"+userData;
+            return adminData;
+        } else {
+            String shopperData = "false,"+userData+","+
+                    ((Shopper)user).getCity().getName()+","+
+                    ((Shopper)user).getAddress()+","+
+                    user.getUserID()+",";
+
+            Iterator it = ((Shopper)user).getCart().entrySet().iterator();
+            while (it.hasNext()) {
+                HashMap.Entry pair = (HashMap.Entry) it.next();
+                Product currentProduct = (Product) pair.getKey();
+                Integer quantity = (Integer) pair.getValue();
+                cartStorage.add(currentProduct.getProductID() + ":" + Integer.toString(quantity));
+            }
+
+            shopperData += "<"+String.join("!",cartStorage)+">";
+            return shopperData;
+        }
+    }
+
+	/**
+	 * Adds a new user to the database.
+	 * @param user
+	 */
+	void addUser(User user) throws IOException {
+		//TODO Should update and add be seperate? The only benefit is that when we add a new user,
+		// we don't have to look through the entire userlist to see if it already exists. Since Store
+		// will always know which it's doing anyway, then it might make sense to keep these separate
+		// Even though updateUser will likely just overwrite the entire User line with a new version of
+		// that user.
+        //
+        // form: UserAdmin(true or false),Username,Password,City(city),Address,UserID,Cart<ProductID:quantity!etc>
+        /**
+        ArrayList<String> cartStorage = new ArrayList<String>();
+        String userData = user.getUserName()+","+user.getPassword();
+        if (user instanceof Administrator) {
+            String adminData = "true,"+userData;
+            lineWriter("",adminData);
+        } else {
+            String shopperData = "false,"+userData+","+
+                    ((Shopper)user).getCity().getName()+","+
+                    ((Shopper)user).getAddress()+","+
+                    user.getUserID()+",";
+
+            Iterator it = ((Shopper)user).getCart().entrySet().iterator();
+            while (it.hasNext()) {
+                HashMap.Entry pair = (HashMap.Entry) it.next();
+                Product currentProduct = (Product) pair.getKey();
+                Integer quantity = (Integer) pair.getValue();
+                cartStorage.add(currentProduct.getProductID() + ":" + Integer.toString(quantity));
+            }
+
+            shopperData += "<"+String.join("!",cartStorage)+">";
+            lineWriter("",shopperData);
+        }
+         **/
+        String userData = createUserData(user);
+        lineWriter("",userData);
+	}
+	
+	//TODO update / add for other types.
+
+	/**
+	 *
+	 */
+	void updateProduct(Product product) throws IOException {
+		//TODO identical to add, but instead of appending at the end, we replace the existing line
+        // form: CategoryID,ProductImage,ProductName,ProductDescription,DoublePrice,IntProductID
+        String productData = product.getCategory().getID()+","+
+                product.getImage()+","+
+                product.getName()+","+
+                product.getDescription()+","+
+                product.getPrice()+","+
+                product.getProductID();
+        // find old product in store
+        // replace that line with our new productData
+        String productID = Integer.toString(product.getProductID());
+        replacement(productID,productData);
+	}
+
+	void addProduct (Product product) throws IOException {
+		//TODO now must save to csv
+        // form: CategoryID,ProductImage,ProductName,ProductDescription,DoublePrice,IntProductID
+        String productData = product.getCategory().getID()+","+
+                product.getImage()+","+
+                product.getName()+","+
+                product.getDescription()+","+
+                product.getPrice()+","+
+                product.getProductID();
+
+        lineWriter("Users,,", productData);
+
+	}
+
+    void addCategory (Category category) throws IOException {
+        //TODO now must save to csv; append at end
+        // form: categoryName,categoryID
+    	String categoryData = category.getName() + "," + category.getID();
+
+        lineWriter("Cities,,",categoryData);
+
+    }
+
+    private String createCityData(City city) {
+        String cityData = city.getName()+","+Boolean.toString(city.distribution)+",";
+        ArrayList<String> adjacencyStorage = new ArrayList<String>();
+        Iterator it = city.cityConnections.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry) it.next();
+            City currentCity = (City) pair.getKey();
+            Integer distance = (Integer) pair.getValue();
+            adjacencyStorage.add(currentCity.getName() + ":" + Integer.toString(distance));
+        }
+
+        cityData += "<"+String.join("!",adjacencyStorage)+">";
+
+        return cityData;
+    }
+    
+    void addCity(City city) throws IOException {
+    	//TODO now must save to csv; append at end
+        // form: CityName,DistributionBoolean,<city1:int!city2:int!city3:int>
+        /**
+        String cityData = city.getName()+","+Boolean.toString(city.distribution)+",";
+        ArrayList<String> adjacencyStorage = new ArrayList<String>();
+        Iterator it = city.cityConnections.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry) it.next();
+            City currentCity = (City) pair.getKey();
+            Integer distance = (Integer) pair.getValue();
+            adjacencyStorage.add(currentCity.getName() + ":" + Integer.toString(distance));
+        }
+
+        cityData += "<"+String.join("!",adjacencyStorage)+">";
+         **/
+
+        String cityData = createCityData(city);
+        lineWriter("Products,,",cityData);
+    }
+
+    void addEdge(City a, City b, int distance) {
+    	//TODO
+    }
+
+    /**
+     * Modify the quantity in center city to newStock for given product.
+     * @param product -> the product for which the stock is changing
+     * @param city -> the city where the stock is changing
+     * @param newStock -> the new stock number
+     */
+	void modifyQuantity(Product product, City city, int newStock) throws IOException {
+		// TODO	does this actually work?
+        product.setStock(city, newStock);
+        updateProduct(product);
+	}
+
+	/**
+	 * Adds distribution center to list of centers in stock hashmap for all products with quantity 0.
+	 * @param newCity -> The new distribution center added.
+	 */
+	void addCenterToProducts(City newCity) {
+		// TODO
+	}
+
+    private void lineWriter (String barrier, String content) throws IOException {
+        //TODO test this
+        // mechanism: exactly like replacement but we don't skip over lines and just append an extra line
+        // to the bottom of each heading section, so we use the next section's header as the "key" for where
+        // the scanner should stop, instead of a counter
+        Scanner scanner = new Scanner(CSVpath);
+        FileWriter writer = new FileWriter(updates,true);
+        String separator = System.getProperty("line.separator");
+
+        while(!scanner.hasNext(barrier)) {
+            writer.append(scanner.nextLine() + separator);
+        }
+
+        writer.append(content + separator);
+
+        while(scanner.hasNext()) {
+            writer.append(scanner.nextLine() + separator);
+        }
+
+        scanner.close();
+        writer.close();
+
+        System.out.println("Currently here");
+
+        PrintWriter deletThis = new PrintWriter(CSVpath);
+        deletThis.write("");
+
+        System.out.println(updates.toPath());
+
+        Files.copy(updates.toPath(), new FileOutputStream(CSVpath));
+
+        deletThis.close();
+
+        System.out.println("copied");
+
+        PrintWriter deletThis2 = new PrintWriter(updates);
+        deletThis2.write("");
+        deletThis2.close();
+
+    }
+
+    private void replacement(String key, String replacingString) throws IOException{
+        //TODO test this
+        // mechanism: scans through each line in the file, adding to a counter
+        // when a line with a unique key for the strong to modify is found (userID, productID),
+        // stop the counter here, now reset the scanner and iterate times the counter's number
+        // we will be writing to updates, emptying csvpath, copying everything from updates to csvpath, emptying updates
+        // this should bring you back to the line to replace <-- CHECK FOR FENCEPOST ERRORS !!
+        // instead of writing that line to the file we write the new data and skip over that line
+        // continue as normal
+        // counter was needed to pinpoint the inline location -- RandomAccessFile would not work because lines are
+        // different lengths
+        Scanner search = new Scanner(CSVpath);
+        FileWriter writer = new FileWriter(updates, true);
+        String separator = System.getProperty("line.separator");
+        int counter = 1;
+        while (search.hasNextLine()) {
+            String currentLine = search.nextLine();
+            if (currentLine.contains(key)) {
+                break;
+            } else {
+                counter+=1;
+            }
+        }
+
+        search.reset();
+
+        for(int i = 0; i<counter; i++) {
+            writer.append(search.nextLine() + separator);
+        }
+
+        writer.append(replacingString + separator);
+        search.nextLine();
+
+        while(search.hasNextLine()) {
+            writer.append(search.nextLine() + separator);
+        }
+
+        search.close();
+        writer.close();
+
+        PrintWriter deletThis = new PrintWriter(CSVpath);
+        deletThis.write("");
+
+
+        Files.copy(updates.toPath(), new FileOutputStream(CSVpath));
+
+        deletThis.close();
+
+        PrintWriter deletThis2 = new PrintWriter(updates);
+        deletThis2.write("");
+        deletThis2.close();
+
+
+
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        String filepath = "database.csv";
+        DBManager database = new DBManager(filepath);
+
+        Category newCategory = new Category("X Shirts",7);
+        Category newCategory2 = new Category("Y Shirts", 12);
+        database.addCategory(newCategory);
+        database.addCategory(newCategory2);
+
+
+    }
+}
+
+	
+

@@ -1,0 +1,34 @@
+package finalproject;
+
+import java.io.IOException;
+
+public class ProjectV1tester {
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		ProjectV1 p = new ProjectV1();
+		Store store = p.store;
+		p.addUser("George", "password", true);
+		p.addUser("Lynn", "password", false);
+		int admin = p.login("George", "password");
+		int ID = p.login("Lynn", "password");
+//		System.out.println(ID);
+		int cat = p.addCategory("PANTPANTS", admin);
+		Shopper Lynn = (Shopper) p.store.getsessionIDList().get(ID);
+		Administrator George = (Administrator) p.store.getsessionIDList().get(admin);
+//		System.out.println("george id: " + George.getUserID());
+		int userID = p.addCustomer("Lynnorino", "Toronto", "92 What's it Dr.", ID);
+		p.addDistributionCenter("Toronto", admin);
+		int prod = p.addProduct("PANTS", cat, 50, admin);
+		System.out.println("PRODUCT ID IS?: " + prod);
+		boolean Quant = p.updateQuantity(prod, "Toronto", 80, admin);
+		Product pants = Store.getProductList().get(prod);
+//		System.out.println("pants id?   "+pants.getProductID());
+//		System.out.println(pants.getQuantity());
+//		System.out.println("TORONTO STOCK IS!?" + stock);
+//		System.out.println("Quant is? " + Quant);
+		boolean added = p.addToShoppingCart(prod, 10, ID, userID);
+//		System.out.println("Added is? " + added);
+//		System.out.println(Lynn.printCart());
+	}
+
+}

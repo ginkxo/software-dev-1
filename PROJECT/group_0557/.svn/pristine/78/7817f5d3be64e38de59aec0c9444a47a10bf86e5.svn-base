@@ -1,0 +1,35 @@
+package finalproject;
+
+import java.util.HashMap;
+
+public class Invoice {
+	private static int InvoiceID = 1;
+	HashMap<Product, int[]> purchaseList; // value is [quantity, price per item]
+	private int totalItems, totalPrice, ID;
+	
+	public Invoice(HashMap<Product, Integer> cart) {
+		//TODO fix everything about invoice.
+		purchaseList = new HashMap<Product, int[]>();
+		for (Product p : cart.keySet()) {
+			int[] quantityAndPrice = {cart.get(p), p.getPrice()};
+			purchaseList.put(p, quantityAndPrice);
+			totalItems += quantityAndPrice[0];
+			totalPrice += quantityAndPrice[0]*quantityAndPrice[1];
+		}
+		this.ID = InvoiceID;
+		InvoiceID++;
+	}
+	
+	public String toString() {
+		String output = "Invoice #" + ID + "\n";
+		output += "Quantity, Price, Item\n";
+		for (Product p : purchaseList.keySet()) {
+			output += purchaseList.get(p)[0] + ",        $" + ((double)purchaseList.get(p)[1])/100 + ", " + p.getName() + "\n";			
+		}
+		output += ("Items purchased: " + totalItems + "\n");
+		output += ("Total price: $" + ((double)totalPrice/100));
+		output += "\n";
+		return output;
+	}
+	
+}

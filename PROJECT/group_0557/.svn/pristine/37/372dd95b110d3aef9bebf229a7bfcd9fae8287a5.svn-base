@@ -1,0 +1,541 @@
+//last update: Jul 31 9:16pm
+
+package finalproject;
+
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.JComboBox;
+
+public class ShopApp extends JFrame {
+	private Store store;
+	private JMenuBar bar;
+	private LoginListener listener;
+	private LogoutListener logoutListener;
+	private RegisterListener regListener;
+	private AdminListener aListener;
+	private CustomerListener cListener;
+	private JMenu startMenu, actionMenu, customerMenu;
+    private JMenuItem loginItem, logoutItem, registerItem;
+    private JMenuItem categoryAction, productAction, warehouseAction, quantityAction, routeAction, cityAction, reportAction; //admin actions
+    private JMenuItem addItem, removeItem, changeQuantity, viewCart; //ShopApp actions
+    private JLabel welcome;
+    private boolean loggedIn, loggedOut;
+    private List<JLabel> prodForSale;
+    
+	public ShopApp() throws NumberFormatException, IOException {
+		super("CSC207 Shopping App");
+		setContentPane(new JLabel(new ImageIcon("Products\\bg.jpg")));
+		setLayout(new FlowLayout());
+		Store store = new Store("testfile.txt");
+		
+		welcome = new JLabel();
+		welcome.setFont(new Font ("Sanserif", Font.ITALIC, 10));
+		welcome.setEnabled(false);
+	    loggedIn = false;
+	    loggedOut = true;
+		prodForSale = new ArrayList<>();
+		addProducts();
+		
+		bar = new JMenuBar();
+		setJMenuBar(bar);
+		
+		setStartMenu();
+		setAdminMenu();
+		actionMenu.setEnabled(false);
+		setCustMenu();
+		customerMenu.setEnabled(false);
+		//START MENU below:
+		/**startMenu = new JMenu("Start");
+		bar.add(startMenu);
+		
+		loginItem = new JMenuItem("Log In");
+		loginItem.setMnemonic('I');
+		startMenu.add(loginItem);
+		listener = new LoginListener();
+		loginItem.addActionListener(listener);
+		
+		//Lynn added this
+		registerItem = new JMenuItem("Register");
+		registerItem.setMnemonic('R');
+		registerItem.setEnabled(true);
+		startMenu.add(registerItem);
+		regListener = new RegisterListener();
+		registerItem.addActionListener(regListener);
+		//
+		
+
+		logoutItem = new JMenuItem("Log Out");
+		logoutItem.setMnemonic(KeyEvent.VK_T);
+		logoutItem.setEnabled(false);
+		startMenu.add(logoutItem);
+		logoutListener = new LogoutListener();
+		logoutItem.addActionListener(logoutListener); **/
+		
+	}
+	
+	public void setStartMenu(){
+		startMenu = new JMenu("Start");
+		bar.add(startMenu);
+		//startMenu.setEnabled(false);
+		
+		loginItem = new JMenuItem("Log In");
+		loginItem.setMnemonic('I');
+		startMenu.add(loginItem);
+		listener = new LoginListener();
+		loginItem.addActionListener(listener);
+		
+		//Lynn added this
+		registerItem = new JMenuItem("Register");
+		registerItem.setMnemonic('R');
+		registerItem.setEnabled(true);
+		startMenu.add(registerItem);
+		regListener = new RegisterListener();
+		registerItem.addActionListener(regListener);
+		//
+		
+
+		logoutItem = new JMenuItem("Log Out");
+		logoutItem.setMnemonic(KeyEvent.VK_T);
+		logoutItem.setEnabled(false);
+		startMenu.add(logoutItem);
+		logoutListener = new LogoutListener();
+		logoutItem.addActionListener(logoutListener);
+	}
+	
+	public void setAdminMenu(){
+		actionMenu = new JMenu("Administrator actions");
+		bar.add(actionMenu);
+		
+		categoryAction = new JMenuItem("Add Category");
+		actionMenu.add(categoryAction);
+		aListener = new AdminListener();
+		categoryAction.addActionListener(aListener);
+		
+		productAction = new JMenuItem("Add Product");
+		actionMenu.add(productAction);
+		productAction.addActionListener(aListener);
+		
+		warehouseAction = new JMenuItem("Add Warehouse");
+		actionMenu.add(warehouseAction);
+		warehouseAction.addActionListener(aListener);
+		
+		quantityAction = new JMenuItem("Add Product Quantity"); //add product quantity to SPECIFIC warehouse
+		actionMenu.add(quantityAction);
+		quantityAction.addActionListener(aListener);
+		
+		routeAction = new JMenuItem("Add Route"); 
+		actionMenu.add(routeAction);
+		routeAction.addActionListener(aListener);
+		
+		cityAction = new JMenuItem("Add City"); 
+		actionMenu.add(cityAction);
+		cityAction.addActionListener(aListener);
+		
+		reportAction = new JMenuItem("Produce Sales Report"); //produce a sales report
+		actionMenu.add(reportAction);
+		reportAction.addActionListener(aListener);
+	}
+	
+	public void setCustMenu(){
+		customerMenu = new JMenu("Customer actions");
+		bar.add(customerMenu);
+		
+		addItem = new JMenuItem("Add Item to Cart");
+		customerMenu.add(addItem);
+		cListener = new CustomerListener();
+		addItem.addActionListener(cListener);
+		
+		removeItem = new JMenuItem("Remove Item from Cart");
+		customerMenu.add(removeItem);
+		removeItem.addActionListener(cListener);
+		
+		changeQuantity = new JMenuItem("Change Item Quantity");
+		customerMenu.add(changeQuantity);
+		changeQuantity.addActionListener(cListener);
+		
+		viewCart = new JMenuItem("View Items in Cart");
+		customerMenu.add(viewCart);
+		viewCart.addActionListener(cListener);
+	}
+	
+	public boolean hasLoggedOut() {
+		return loggedOut;
+	}
+	
+	private class RegisterListener implements ActionListener {
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			JTextField newUsername = new JTextField();
+			JTextField newPassword = new JPasswordField();
+			Object[] message = {
+			    "Enter desired username:", newUsername,
+			    "Enter desired password:", newPassword
+			};
+	        //boolean result = false;
+			int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
+			if (option == JOptionPane.OK_OPTION) {
+				/*User user = new User(username.getText(), new String(((JPasswordField) password).getPassword()));
+			    UserManager m = new UserManager();
+			    result = m.validate(user);
+			    if(result)
+			    	welcome.setText("Welcome, " + username.getText() + "!  "); 
+			    	*/
+			} /*else {
+			    result= false;
+			}
+			return result; */
+			//
+		}
+		
+	}
+	
+	private class LogoutListener implements ActionListener { //Lynn added this entire Listener
+		public void actionPerformed(ActionEvent arg0) {
+			loginItem.setEnabled(true);
+			registerItem.setEnabled(true);
+			logoutItem.setEnabled(false);
+			loggedIn = false;
+			loggedOut = true;
+			bar.remove(4); //removes admin/customer buttons from header
+			//2 second button
+			//3 glue
+			//4 welcome (name)
+			//bar.removeAll(); //bar is not null, but bar has nothing in it at this point
+			
+			actionMenu.setEnabled(false);
+			customerMenu.setEnabled(false);
+			
+			revalidate();
+			//setStartMenu();
+			//revalidate();
+			//for(int i = 0; i < 5; i++){ //CHECKS FOR BAR THINGS
+			//	System.out.println(bar.getComponent(i));
+			//}
+		}
+	}
+	
+	private class AdminListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			System.out.println(arg0.getActionCommand()); //returns name of JMenuItem eg String "Add Category;
+			if (arg0.getActionCommand().equals("Add Category")){
+				
+				JTextField newCategory = new JTextField();
+				Object[] message = {
+				    "Type in name for new category:", newCategory,
+				};
+				
+				int option = JOptionPane.showConfirmDialog(null, message, "Add category", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+				    
+				}
+			}
+			else if (arg0.getActionCommand().equals("Add Product")){
+				ArrayList<String> cNames = new ArrayList<String>(); //DO THIS BUT WITH CATEGORY OPTIONS
+				cNames.add("p1");
+				String[] catNames = new String[cNames.size()];
+				for(int i = 0; i < cNames.size(); i++) {
+    				catNames[i] = cNames.get(i);
+				}
+				JComboBox<Object> catList = new JComboBox<Object>(catNames);
+
+				JTextField prodName = new JTextField();
+				JTextArea pD = new JTextArea(3,1);
+				JScrollPane prodDescription = new JScrollPane(pD);
+				
+				Object[] message = {
+					"Enter name for product:", prodName,
+				    "Choose product category:", catList,
+				    "Enter product description:", prodDescription
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add product", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Add Warehouse")){
+				ArrayList<String> cNames = new ArrayList<String>(); //DO THIS BUT WITH MAP LOCATIONS (that aren't already warehouses)
+				cNames.add("p1");
+				String[] catNames = new String[cNames.size()];
+				for(int i = 0; i < cNames.size(); i++) {
+    				catNames[i] = cNames.get(i);
+				}
+				JComboBox<Object> catList = new JComboBox<Object>(catNames);
+				
+				Object[] message = {
+				    "Choose new warehouse location:", catList
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add warehouse location", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Add Product Quantity")){
+				
+				ArrayList<String> pNames = new ArrayList<String>();
+				pNames.add("p1"); //CHANGE THIS SO ALL PRODS ARE ADDED
+				String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+				//---------------------------------------------------------------
+				ArrayList<String> cNames = new ArrayList<String>(); //DO THIS BUT WITH MAP LOCATIONS (that aren't already warehouses)
+				cNames.add("p1");
+				String[] catNames = new String[cNames.size()];
+				for(int i = 0; i < cNames.size(); i++) {
+    				catNames[i] = cNames.get(i);
+				}
+				JComboBox<Object> catList = new JComboBox<Object>(catNames);
+
+				JTextField prodAmount = new JTextField();
+				
+				
+				Object[] message = {
+					"Choose product to replenish:", productList,
+					"Enter quantity to add (integer):", prodAmount,
+				    "Choose warehouse:", catList
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add warehouse location", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Add Route")){
+				ArrayList<String> pNames = new ArrayList<String>(); //DO THIS BUT WITH MAP LOCATIONS
+				pNames.add("p1"); //CHANGE THIS SO ALL PRODS ARE ADDED
+				String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+				//---------------------------------------------------------------
+				ArrayList<String> cNames = new ArrayList<String>(); //DO THIS BUT WITH MAP LOCATIONS (that aren't already warehouses)
+				cNames.add("p1");
+				String[] catNames = new String[cNames.size()];
+				for(int i = 0; i < cNames.size(); i++) {
+    				catNames[i] = cNames.get(i);
+				}
+				JComboBox<Object> catList = new JComboBox<Object>(catNames);
+
+				JTextField distance = new JTextField();
+				
+				
+				Object[] message = {
+					"Choose map point A:", productList,
+					"Choose map point B:", catList,
+				    "Enter distance:", distance
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add warehouse location", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			}
+			
+			else if (arg0.getActionCommand().equals("Add City")){
+				
+				String[] options = new String[]{"Yes", "No"};
+				JComboBox<Object> isDistCenter = new JComboBox<Object>(options);
+
+				JTextField newCityName = new JTextField();
+				
+				Object[] message = {
+					"Enter name for city:", newCityName,
+					"Is this a distribution center?:", isDistCenter
+				    
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add new city", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			}
+			
+			else if (arg0.getActionCommand().equals("Produce Sales Report")){
+				
+			}
+			
+		}
+	}
+	
+	private class CustomerListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			System.out.println(arg0.getActionCommand()); //returns name of JMenuItem eg String "Add Category;
+			if (arg0.getActionCommand() == "Add Item to Cart"){
+				
+				ArrayList<String> pNames = new ArrayList<String>();
+				pNames.add("p1"); //CHANGE THIS SO ALL PRODS ARE ADDED
+				String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+
+				JTextField desiredQuantity = new JTextField();
+				Object[] message = {
+					"Pick your product:", productList,
+				    "Enter desired quantity (integer):", desiredQuantity
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add item to cart", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Remove Item from Cart")){
+				ArrayList<String> pNames = new ArrayList<String>();
+				pNames.add("p1");
+				String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+
+				JTextField desiredQuantity = new JTextField();
+				Object[] message = {
+					"Choose product to remove:", productList,
+				    "Enter quantity to remove (integer):", desiredQuantity
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Remove item from cart", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+				
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Change Item Quantity")){
+				ArrayList<String> pNames = new ArrayList<String>();
+				pNames.add("p1");
+				String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+
+				JTextField desiredQuantity = new JTextField();
+				Object[] message = {
+					"Choose product in cart:", productList, //SHOULD SHOW CURRENT AMOUNT?
+				    "Enter new quantity (integer):", desiredQuantity
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Change item quantity", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			}
+			else if (arg0.getActionCommand().equals("View Items in Cart")){
+				
+			}
+		}
+	}
+
+	private class LoginListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			try {
+				User user = login();
+				if(user != null) {
+					int sessionID = user.getSessionID();
+					loginItem.setEnabled(false);
+					registerItem.setEnabled(false); //Lynn added this
+					logoutItem.setEnabled(true);
+					loggedIn = true;
+					loggedOut = false;
+					if (Store.isAdmin(sessionID)) {
+						actionMenu.setEnabled(true);						
+					}
+					else if (Store.isShopper(sessionID)) {
+						customerMenu.setEnabled(true);						
+					}
+										
+				
+					//Lynn added this--end
+					
+					bar.add(add(Box.createHorizontalGlue()));
+					bar.add(welcome);
+					for(JLabel l : prodForSale)
+						l.setToolTipText("Add to shopping cart!");
+					revalidate();
+					//for(int i = 0; i < 5; i++){ //CHECKS FOR BAR THINGS
+					//	System.out.println(bar.getComponent(i));
+					//}
+					
+					
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private User login() throws IOException {
+		
+		JTextField username = new JTextField();
+		JTextField password = new JPasswordField();		
+		
+		Object[] message = {
+		    "Username:", username,
+		    "Password:", password
+		};
+		User user = null;
+		int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
+		if (option == JOptionPane.OK_OPTION) {
+			String name = username.getText();
+			String pw = new String(((JPasswordField) password).getPassword());
+			System.out.println("NAME: " + name + " PASS: " + pw);
+			user = Store.login(username.getText(), new String(((JPasswordField) password).getPassword()));
+		    if(user != null)
+		    	welcome.setText("Welcome, " + username.getText() + "!  ");
+		} else {
+		    return null;
+		}
+		return user;
+	}
+	
+	private void addProducts() {
+		Collection<Product> products = Store.getProductList().values();
+        JLabel prod;
+		for(Product p : products) {
+			ImageIcon prodImage = new ImageIcon("Products\\"+p.getImage());
+			prod = new JLabel();
+			prod.setIcon(prodImage);
+			prod.setText(p.getName());
+			prod.setHorizontalTextPosition(JLabel.CENTER);
+			prod.setVerticalTextPosition(JLabel.BOTTOM);
+			prod.setToolTipText("Login to buy products!");
+			add(prod);
+			prodForSale.add(prod);
+		}
+	}
+}

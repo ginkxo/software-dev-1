@@ -1,0 +1,22 @@
+finalproject/testShopper.java:6: error: no suitable constructor found for Shopper(no arguments)
+		Shopper Bob = new Shopper();
+		              ^
+    constructor Shopper.Shopper(String,String) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor Shopper.Shopper(String,String,City,String,int,HashMap<Product,Integer>) is not applicable
+      (actual and formal argument lists differ in length)
+finalproject/testShopper.java:7: error: no suitable constructor found for Shopper(no arguments)
+		Shopper Jill = new Shopper();
+		               ^
+    constructor Shopper.Shopper(String,String) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor Shopper.Shopper(String,String,City,String,int,HashMap<Product,Integer>) is not applicable
+      (actual and formal argument lists differ in length)
+finalproject/testShopper.java:8: error: incompatible types: String cannot be converted to Category
+		Product PokemonShirt = new Product("TSHIRT", "Pokemon Shirt", "Team Mystic v-neck", 2000, 50);
+		                                   ^
+finalproject/testShopper.java:9: error: incompatible types: String cannot be converted to Category
+		Product PokemonBackpack = new Product("BACKPACK", "Pokemon Backpack", "The perfect place to store your pokeballs", 2850, 50);
+		                                      ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+4 errors

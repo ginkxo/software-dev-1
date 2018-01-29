@@ -1,0 +1,33 @@
+package finalproject;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+
+public class StoreTester {
+	static Store shop;
+
+	public static void main(String[] args) throws FileNotFoundException {
+		shop = new Store("testfile.txt");
+//		shop.createAdmin("George", "pw");
+//		shop.login("George", "pw");
+		HashMap<Integer, Category> x = Store.getCategories();
+		System.out.println(shop.printCategories());
+//		for (City i : shop.getCities().values()) {
+//			System.out.println(i);
+//		}
+		System.out.println(Store.graph);
+		for (Product p : shop.getProductList().values()) {System.out.println(p);}
+		System.out.println(shop.getProductList().get(7).getStock());
+		Administrator George = (Administrator) shop.login("George",  "password");
+		//		Shopper Lynn =((Shopper)shop.getUserList().get("Lynn"));
+		User Lynn = shop.login("Lynn", "password");
+		System.out.println(Lynn.getClass());
+		int ID = Lynn.getSessionID();
+		int ID2 = George.getSessionID();
+		System.out.println(Store.isShopper(ID));
+		System.out.println(Store.isAdmin(George.getSessionID()));
+		int newProd = George.addProductRequest(Store.getCategory(3), "","Pants", "", 12);
+		System.out.println(newProd);
+	}
+}
+	

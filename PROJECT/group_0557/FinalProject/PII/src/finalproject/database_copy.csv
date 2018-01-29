@@ -1,0 +1,16 @@
+Categories,,
+AShirts,1
+BShirts,2
+CShirts,3
+DShirts,4
+EShirts,5
+Cities,,
+Alabama,true
+Toronto,true
+Mexico,false,<Alabama:5!Toronto:100>
+Products,,
+1,pokemon1.jpg,Abomasnow Shirt,very cute lil thing,32.60,39205902
+4,pokemon2.jpg,Dunsparce Shirt,what the hell is this,666.66,19470224
+Users,,
+false,Lynn,password,Mexico,92 What's it road,43204920,<1:5>
+true,George,password,Mexico,92 What's it road,43290384,<4:2>

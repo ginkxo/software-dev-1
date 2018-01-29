@@ -1,0 +1,104 @@
+package finalproject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+public class Store {
+	
+	private int userIDGenerator;
+	private int categoryGenerator;
+	private int productIDGenerator;
+	private int revenueGenerated;
+	private static HashMap<String, User> userList;
+	private static HashMap<Integer, Product> productList;
+	private static DBManager csvDB;
+	private static HashMap<Integer, User> sessionIDList;
+	private ArrayList<String> categories;
+	
+	public Store(String csvPath){
+		this.csvDB = new DBManager(csvPath);
+		this.userList = this.csvDB.loadUsers(); //returns hashmap of users
+		this.productList = this.csvDB.loadProducts(); //returns hashmap of products
+		sessionIDList = new HashMap<Integer, User>(); //empty hashmap of sessionIDs
+		categories = new ArrayList<String>(); //empty arraylist for product categories
+		
+	}
+	
+	public User login(String username, String password){
+		if (userList.get(username) != null){
+			if (password == userList.get(username).password){
+				userList.get(username).sessionID = 1234;
+				sessionIDList.put(userList.get(username).sessionID, userList.get(username));
+				return userList.get(username);
+			}
+
+		}
+		return null;
+	}
+	
+	public void createShopper(String username, String password){
+		Shopper s = new Shopper(username,password);
+		userList.put(s.username, s);
+		
+		
+	}
+	
+	public void createAdmin(String username, String password){
+		Administrator a = new Administrator(username, password);
+		userList.put(a.username, a);
+	}
+	
+	
+	public void addProduct(String category, String image, String name, String description, double price, int sessionID){
+		if isAdmin(sessionID){
+			Product p = new Product(category, /*image, */ name, description, price, 0);
+			productList.put(p.getProductID(), p);
+		}
+
+	}
+	
+	public void modifyProduct(Product product, String category, String image, String name, String description, double price, int quantity){
+		if isAdmin(sessionID){
+			product.setCategory(category);
+			product.setDescription(description);
+			product.setPrice(price);
+			product.setQuantity(quantity);
+			product.setName(name);
+			//images not implemented yet
+		}
+	}
+	
+	
+	public HashMap<Integer, User> getUserList(){
+		return userList;
+	}
+	
+	public HashMap<Integer, Product> getProductList(){
+		return productList;
+	}
+	
+	public boolean authenticate(int sessionID){
+		User checker = sessionIDList.get(sessionID);
+		return checker != null;
+		
+	}
+	
+	public boolean isAdmin(int sessionID){
+		if (authenticate(sessionID)){
+			User user = sessionIDList.get(sessionID); 
+			return user instanceof Administrator;
+		}
+		
+	}
+	
+	public void addCategory(String category, int sessionID){
+		if isAdmin(sessionID){
+			categories.add(category);
+		}
+	}
+
+	
+	
+
+}

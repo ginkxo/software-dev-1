@@ -1,0 +1,23 @@
+package finalproject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ProductManager {
+	
+	private List<Product> products;
+	
+	public ProductManager() {
+		products = new ArrayList<>();
+		// Load product from file here
+		Product p1 = new Product(1,"Product",9.99,10,"hotel1.jpg");
+		products.add(p1);
+		Product p2 = new Product(2,"Another Product",99.99,11,"hotel4.jpg");
+		products.add(p2);
+	}
+	
+    public List<Product> getProducts() {
+    	return products;
+    }
+
+}

@@ -1,0 +1,58 @@
+package finalproject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import finalproject.ProjectV1.ShoppingCartItem;
+
+public class ProjectV1tester {
+
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		ProjectV1 p = new ProjectV1();
+		Store store = p.store;
+		p.addUser("Georgeyss", "password", true);
+		p.addUser("Lynn", "password", false);
+		int admin = p.login("Georgeyss", "password");
+		int ID = p.login("Lynn", "password");
+//		System.out.println(ID);
+		int cat = p.addCategory("PANTPANTS", admin);
+		Shopper Lynn = (Shopper) p.store.getsessionIDList().get(ID);
+		Administrator George = (Administrator) p.store.getsessionIDList().get(admin);
+//		System.out.println("george id: " + George.getUserID());
+		p.addDistributionCenter("Vancouver", admin);
+		p.addRoute("Toronto", "Vancouver", 10500, admin);
+		int userID = p.addCustomer("Lynnorino", "Toronto", "92 What's it Dr.", ID);
+		int prod = p.addProduct("PANTS", cat, 50, admin);
+		System.out.println("PRODUCT ID IS?: " + prod);
+		boolean Quant = p.updateQuantity(prod, "Vancouver", 80, admin);
+		Product pants = Store.getProductList().get(prod);
+//		System.out.println("pants id?   "+pants.getProductID());
+//		System.out.println(pants.getQuantity());
+//		System.out.println("TORONTO STOCK IS!?" + stock);
+//		System.out.println("Quant is? " + Quant);
+		boolean added = p.addToShoppingCart(prod, 10, ID, userID);
+//		System.out.println("Added is? " + added);
+//		System.out.println(Lynn.printCart());
+		ArrayList<ProjectV1.ShoppingCartItem> cart = (ArrayList<ShoppingCartItem>) p.getShoppingCart("Lynn");
+		for (ShoppingCartItem i : cart) {
+			System.out.println("ID: " + i.getProdID()
+							 + "\ncenter: " + i.getCenter()
+							 + "\nquantity: " + i.getQuantity());
+		}
+		int orderID = p.checkout(1, ID);
+		System.out.println(orderID);
+		System.out.println("cart should be empty:\n");
+		for (ShoppingCartItem i : cart) {
+			System.out.println("ID: " + i.getProdID()
+							 + "\ncenter: " + i.getCenter()
+							 + "\nquantity: " + i.getQuantity());
+		}
+		System.out.println("route: " + p.getDeliveryRoute(orderID, ID));
+		System.out.println("invoice amount: " + p.invoiceAmount(orderID, ID));
+		System.out.println("\n\n\n");
+		System.out.println(p.prodInquiry(10, "Flaf"));
+		System.out.println(p.prodInquiry(70000000, "flaf"));
+		System.out.println(p.prodInquiry(70000000, "Toronto"));
+		System.out.println(p.prodInquiry(70000000, "Vancouver"));
+	}
+}

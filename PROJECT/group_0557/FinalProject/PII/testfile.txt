@@ -1,0 +1,17 @@
+Categories,,
+AShirts,31000000
+BShirts,31000001
+CShirts,31000002
+DShirts,31000003
+EShirts,31000006
+Cities,,
+Alabama,true
+Toronto,true
+Mexico,false,<Alabama:500!Toronto:100>
+Products,,
+31000001,,Shirt-A-Yo,This is a groovy AF shirt,12.5,71000000,<>
+31000003,,Shirt-A-Blo,,12.50,51000000,<Alabama:3!Toronto:5>
+31000003,,Pants,,12.0,71000001,<>
+Users,,
+false,Lynn,password,Mexico,92 What's it road,4,<>
+true,George,password,Mexico,92 What's it road,4

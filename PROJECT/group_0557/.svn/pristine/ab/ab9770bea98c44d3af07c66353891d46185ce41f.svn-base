@@ -1,0 +1,113 @@
+package finalproject;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+public class Graph {
+	private ArrayList<City> cities;
+
+    public Graph() {
+    	cities = new ArrayList<City>();
+    }
+    
+    public void addCity(City city){
+    	cities.add(city);
+    }
+    
+    public void addEdge(City a, City b, int distance){
+    	//TODO change distance
+    	
+    	if (!a.cityConnections.containsKey(b)) {
+    		a.cityConnections.put(b, distance);
+    		b.cityConnections.put(a, distance);
+    	}
+    }
+
+    @Override
+    public String toString() {
+    	String output = "";
+    	for (City city : cities) {
+    		output += city.name + ": ";
+    		for (City connection : city.cityConnections.keySet()) {
+    			output += "[" + connection.getName() + ", " +
+    					city.cityConnections.get(connection) + "], ";
+    		}
+    		output += "\n";
+    	}
+    	return output;
+    }
+
+    public ArrayList<City> getShortestRoute(City start) {
+    	class Route{
+    		City currentCity;
+    		ArrayList<City> visitedCities;
+    		int distance;
+    		Route(City currentCity, ArrayList<City> visitedCities, int distance) {
+    			this.currentCity = currentCity;
+    			this.visitedCities = new ArrayList<City>();
+    			if (visitedCities != null) {
+    				for (City city: visitedCities) this.visitedCities.add(city);
+    			}
+    			this.distance = distance;
+    		}
+    		void addVisited(City city) {
+   			visitedCities.add(city);
+    		}
+    	}
+    	LinkedList<Route> toVisit = new LinkedList<Route>();
+    	int shortestPath = -1;
+    	Route bestPath = null;
+
+    	toVisit.add(new Route(start,null,0));
+    	while (!toVisit.isEmpty()) {
+        	Route currentNode = toVisit.removeFirst();
+        	if (shortestPath != -1 && currentNode.distance > shortestPath) {
+        		continue;
+        	}
+        	if (currentNode.currentCity.distribution) {
+        		if ((shortestPath == -1) || (currentNode.distance < shortestPath)) {
+        			shortestPath = currentNode.distance;
+        			bestPath = currentNode;
+        			continue;
+        		}	
+        	}
+        	for (City city : currentNode.currentCity.cityConnections.keySet()) {        		
+        		if (!currentNode.visitedCities.contains(city)) {
+        			ArrayList<City> newVisited = new ArrayList<City>();
+        			for (City city2 : currentNode.visitedCities) newVisited.add(city2);
+        			newVisited.add(currentNode.currentCity);
+        			int newDistance = currentNode.distance;
+        			newDistance += currentNode.currentCity.cityConnections.get(city);
+        			Route newRoute = new Route(city, newVisited, newDistance);
+        			toVisit.add(newRoute);
+        		}
+        	}
+    	}
+    	if (bestPath != null) {
+    		System.out.println("Total distance: " + bestPath.distance);
+    		bestPath.addVisited(bestPath.currentCity);
+    		return bestPath.visitedCities;}
+    	else {return null;}
+    }
+    
+    public static void main(String[] args) {
+    	Graph x = new Graph();
+    	City A = new City("A", false);
+	    City B = new City("B", true);
+	    City C = new City("C", false);		
+	    City D = new City("D", true);
+	    x.addCity(A);
+    	x.addCity(B);
+    	x.addCity(C);
+    	x.addCity(D);    	
+    	x.addEdge(A, B, 10);
+    	x.addEdge(A, C, 8);
+    	x.addEdge(B, C, 3);
+    	x.addEdge(D, C, 3);
+    	System.out.println(x);;
+    	ArrayList<City> y = x.getShortestRoute(A);
+    	if (y != null) {
+    	for (City z : y) {System.out.println(z.getName());}
+    	} else {System.out.println("no path found");}
+    }
+}

@@ -1,0 +1,40 @@
+package redbeard;
+
+import heap.HeapEmptyException;
+import heap.HeapFullException;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+//TODO: TESTING!
+
+// This class is not part of your evaluation. You may use it for testing if you want.
+public class GameTest {
+
+	/**
+	 * @param args
+	 * @throws HeapEmptyException 
+	 * @throws HeapFullException 
+	 * @throws FileNotFoundException 
+	 */
+	public static void main(String[] args) throws IOException, HeapFullException, HeapEmptyException {
+		// TODO Auto-generated method stub
+		TreasureHunt game = new TreasureHunt(5,5,15,3,100);
+        TreasureHunt game2 = new TreasureHunt();
+//        System.out.println("Boat Coordinates:");
+//        System.out.println(game.islands.getBoat().gridX);
+//        System.out.println(game.islands.getBoat().gridY);
+
+//        game.play("src/game.txt");
+        System.out.println(game.getMap());
+        System.out.println(game.state);
+        System.out.println(game.pathLength());
+
+
+//        System.out.println(game.getMap());
+
+
+
+	}
+
+}

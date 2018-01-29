@@ -1,0 +1,22 @@
+A logged in user locates all items of category TSHIRT with a price in the range 5 to 10 dollars and places an order for two such items.
+
+1. Shopper: Search for TSHIRTS $5 - $10
+	Given: List of Categories
+
+2. Store: List Products
+	Given: Category, MinPrice, MaxPrice
+
+3. Shopper: Add to Cart
+	Given: Product, Quantity
+
+4. Shopper: Check-out
+	Given: Cart
+
+5. Store: Authenticate Purchase
+	Given: Cart
+
+6. Store: Modify Product (quantity)
+	Given: Cart
+
+7. Shopper: Generate Invoice
+	Given: Cart, Authentication

@@ -1,0 +1,284 @@
+package world;
+
+import heap.Heap;
+import heap.HeapEmptyException;
+import heap.HeapFullException;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
+import java.lang.Math;
+
+public class Grid {
+
+	private final int DEFAULT_WIDTH = 60; // default width of the world map - gridX runs from 0 to 59
+	private final int DEFAULT_HEIGHT = 15; // default height of the map - gridY runs from 0 to 14
+	private final int DEFAULT_PERCENT = 20; // this is the percentage of the map occupied by islands
+	protected int width, height; // user defined width and height, if one is not using defaults
+	protected int percent; // user defined percentage of islands on the map
+	protected Node treasure; // points to the map node where the Redbeard treasure is sunken
+	protected Node boat; // points to the current location of our boat on the map
+
+	protected Node[][] map; // the map
+
+	public Grid() {
+		width = DEFAULT_WIDTH;
+		height = DEFAULT_HEIGHT;
+		percent = DEFAULT_PERCENT;
+		buildMap();
+	}
+
+	public Grid(int width, int height, int percent) {
+		this.width = width;
+		this.height = height;
+		if (percent <= 0 || percent >= 100)
+			this.percent = DEFAULT_PERCENT;
+		else
+			this.percent = percent;
+		buildMap();
+	}
+
+	private void buildMap() {
+		// Your implementation goes here
+		// For each map position (i,j) you need to generate a Node with can be navigable or it may belong to an island
+		// You may use ideas from Lab3 here.
+		// Don't forget to generate the location of the boat and of the treasure; they must be on navigable waters, not on the land!
+		//TODO
+		map = new Node[this.width][this.height];
+
+		int islandNumber = Math.round((this.width*this.height)*((double)this.percent/100));
+		for (int i=0; i<this.width; i++) {
+			for (int j=0; j<this.height; j++) {
+				map[i][j] = new Node(true, i, j);
+			} 
+		}
+
+		Random rand1 = new Random();
+		//where should we put this? in the while loop?
+
+		while (islandNumber > 0) {
+
+			int xval = rand1.nextInt(this.width);
+			int yval = rand1.nextInt(this.height);
+
+			if (map[xval][yval].walkable) {
+				map[xval][yval].walkable == false;
+				islandNumber = islandNumber - 1;
+			}
+
+		}
+
+		Random rand2 = new Random();
+
+		treasure = new Node();
+		boat = new Node();
+
+		while (treasure.gridX == null && treasure.gridY == null) {
+			int setX = rand2.nextInt(this.width);
+			int setY = rand2.nextInt(this.height);
+
+			if (map[setX][setY].walkable) {
+				treasure.gridX = setX;
+				treasure.gridY = setY;
+				treasure.walkable = false;
+				map[setX][setY] = treasure;
+
+			}
+
+
+		}
+
+		while (boat.gridX == null && boat.gridY == null) {
+			int setX = rand2.nextInt(this.width);
+			int setY = rand2.nextInt(this.height);
+
+			if (map[setX][setY].walkable) {
+				boat.gridX = setX;
+				boat.gridY = setY;
+				boat.walkable = false;
+				map[setX][setY] = boat;
+
+			}
+		}
+
+
+
+	}
+
+	public String drawMap() {
+		// provided for your convenience
+		String result = "";
+		String hline = "       ";
+		String extraSpace;
+		for (int i = 0; i < width / 10; i++)
+			hline += "         " + (i + 1);
+		result += hline + "\n";
+		hline = "       ";
+		for (int i = 0; i < width; i++)
+			hline += (i % 10);
+		result += hline + "\n";
+		for (int i = 0; i < height; i++) {
+			if (i < 10)
+				extraSpace = "      ";
+			else
+				extraSpace = "     ";
+			hline = extraSpace + i;
+			for (int j = 0; j < width; j++) {
+				if (i == boat.gridY && j == boat.gridX)
+					hline += "B";
+				else if (i == treasure.gridY && j == treasure.gridX)
+					hline += "T";
+				else if (map[i][j].inPath)
+					hline += "*";
+				else if (map[i][j].walkable)
+					hline += ".";
+				else
+					hline += "+";
+			}
+			result += hline + i + "\n";
+		}
+		hline = "       ";
+		for (int i = 0; i < width; i++)
+			hline += (i % 10);
+		result += hline + "\n";
+		return result;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getPercent() {
+		return percent;
+	}
+	
+	public Node getBoat() {
+		return boat;
+	}
+	
+	private ArrayList<Node> getNeighbours(Node node) {
+		// each node has at most 8 neighbours
+		// Lab3 may be useful here as well
+        //TODO
+        ArrayList<Node> neighbours = new ArrayList<Node>();
+
+        int localX = node.gridX;
+        int localY = node.gridY;
+
+        int xc[] = {localX-1, localX, localX+1};
+        int yc[] = {localY-1, localY, localY+1};
+
+        // XXX
+        // X X
+        // XXX
+        // is the format of adjacent nodes
+        // xc contains a list of possible x coords nearby
+        // yc contains a list of possible y coords nearby
+        // we iterate through every combination and if it's in the bounds
+        // and not the node itself, then we add the node to the list
+        // NOTE: do we add only walkable nodes?
+
+        for (int x : xc) {
+        	for (int y : yc) {
+        		if (x >= 0 && x <= this.width && y >= 0 && y <= this.height) {
+        			if (x == node.gridX && y == node.gridY && !map[x][y].walkable) {
+        				continue;
+        			}
+        			else {
+        				neighbours.add(map[x][y]);
+        			}
+        		}
+        	}
+        }
+
+        return neighbours;
+	}
+
+	private int getDistance(Node nodeA, Node nodeB) {
+		// helper method. Provided for your convenience.
+		int dstX = Math.abs(nodeA.gridX - nodeB.gridX);
+		int dstY = Math.abs(nodeA.gridY - nodeB.gridY);
+		if (dstX > dstY)
+			return 14 * dstY + 10 * (dstX - dstY);
+		return 14 * dstX + 10 * (dstY - dstX);
+	}
+
+	public void findPath(Node startNode, Node targetNode)
+			throws HeapFullException, HeapEmptyException {
+		Heap<Node> openSet = new Heap<>(width * height); // this where we make use of our heaps
+		// The rest of your implementation goes here.
+		// This method implements A-star path search algorithm.
+		// The pseudocode is provided in the appropriate web links.
+		// Make sure to use the helper method getNeighbours
+        //TODO
+
+        Heap<Node> closedSet = new Heap<>(width * height);
+        startNode.hCost = 0;
+        startNode.gCost = 0;
+        openSet.add(startNode);
+
+        while (!openSet.isEmpty()) {
+        	Node q = openSet.removeFirst();
+        	ArrayList<Node> neighbours = q.getNeighbours();
+        	for (Node x : neighbours) {
+        		x.parent = q;
+        	}
+        	for (Node z : neighbours) {
+        		if (z.equals(targetNode)) {
+        			break;
+        		}
+        		z.gCost = q.gCost + getDistance(q, z);
+        		z.hCost = getDistance(z, targetNode);
+        		z.fCost = z.gCost + z.hCost;
+
+        		if (!openSet.isEmpty() && openSet.item[0].fCost < z.fCost && 
+        			openSet.item[0].gridX.equals(z.gridX) && 
+        			openSet.item[0].gridY.equals(z.gridY)) {
+        				continue;
+        		} else if (!closedSet.isEmpty() && closedSet.item[0].fCost < z.fCost && 
+        			closedSet.item[0].gridX.equals(z.gridX) && 
+        			closedSet.item[0].gridY.equals(z.gridY)) {
+        				continue;
+        		} else {
+        			openSet.add(z);
+        		}
+
+        	}
+        	closedSet.add(q);
+        }
+
+        
+	}
+
+	public ArrayList<Node> retracePath(Node startNode, Node endNode) {
+		Node currentNode = endNode;
+	    ArrayList<Node> path = new ArrayList<Node>();
+		while (currentNode != startNode && currentNode != null) {
+			currentNode.inPath = true;
+			path.add(currentNode);
+			currentNode = currentNode.parent;
+		}
+		return path;
+	}
+
+	public void move(String direction) {
+		// Direction may be: N,S,W,E,NE,NW,SE,SW
+		// move the boat 1 cell in the required direction
+        //TODO
+	}
+	
+	public Node getTreasure(int range) {
+		// range is the range of the sonar
+		// if the distance of the treasure from the boat is less or equal that the sonar range,
+		// return the treasure node. Otherwise return null.
+        //TODO
+        return null;
+	}
+
+}

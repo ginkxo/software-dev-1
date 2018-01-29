@@ -1,0 +1,16 @@
+Categories,,
+AShirts,1
+BShirts,2
+CShirts,3
+DShirts,4
+EShirts,5
+Cities,,
+Alabama,true
+Toronto,true
+Mexico,false,<Alabama:5!Toronto:100>
+Products,,
+4,,Shirt-A-Yo,This is a groovy AF shirt,12.50,7
+1,,Shirt-A-Blo,,12.50,1,Alabama,3,Toronto,5
+Users,,
+false,Lynn,password,Mexico,92 What's it road,4,<4:5>
+true,George,password,Mexico,92 What's it road,4

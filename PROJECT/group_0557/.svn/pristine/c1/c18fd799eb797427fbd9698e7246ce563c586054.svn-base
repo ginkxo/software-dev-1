@@ -1,0 +1,40 @@
+package finalproject;
+
+public class Administrator {
+	//username,pass, sessionID, 
+	private String username, password;
+	protected int sessionID; 
+
+    public Administrator(String username, String password) {
+    	if (Store.authenticateUser(username, password) == "Administrator") {    		
+	    	this.username = username;
+	    	this.password = password;	    	
+    }
+    
+    public boolean addProductRequest(String category, String image, String name, String description, int price){
+    	Store.addProduct(category, image, name, description, price, this.sessionID);
+    	return true;
+    }
+    
+    public boolean modifyProductRequest(Product product, String category, String image, String name, String description, int price){
+    	Store.modifyProduct(category, image, name, description, price, this.sessionID);
+    }
+    
+    public boolean addCategoryRequest(String categoryName){
+    	Store.addCategory(categoryName, this.sessionID); //adds to category 
+    }
+
+    // Sets the quantity of product at distribution center city to quantity.
+    // If product does not exist, or if city DNE / is not a distribution centre, does nothing.
+    public boolean modifyQuantityRequest(Product product, City city, int quantity) {
+    	Store.modifyQuantity(product, city, quantity, this.sessionID);
+    }
+
+    public List[] listCategories(){
+    	return Store.
+    }
+
+    public ArrayList<Category> listCategories(){
+    	return Store.getCategories();
+    }
+}

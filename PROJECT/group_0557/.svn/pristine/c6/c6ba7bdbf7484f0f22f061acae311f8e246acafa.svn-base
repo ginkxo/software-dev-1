@@ -1,0 +1,19 @@
+MEETINGS
+================================
+PLANNING MEETING (Work session after)
+Date and time: 22 Jul 2016, 11:00
+Location: Bahen Centre
+In Attendance: Everyone
+Current state of the project:
+	-Updated CRCs
+	-Figured out Project.java with some questions, which were asked on Piazza.
+	-Completed basic structure of Invoice, Product, and Shopper classes
+	-Work divided
+	-Barebones structure of Store.java completed
+Tasks for this week:
+	-Complete Store and DBManager classes (Greg and Tanuj)
+	-Complete User-Admin-Shopper-Product-Category-Invoice Suite (George and Lynn)
+	-Figure out GraphBuilder
+	-
+
+==============================

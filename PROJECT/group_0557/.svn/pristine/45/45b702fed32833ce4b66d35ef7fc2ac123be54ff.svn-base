@@ -1,0 +1,920 @@
+//last update: aug 3 3:21 am
+
+package finalproject;
+
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JComboBox;
+
+public class ShopApp extends JFrame {
+	private Store store;
+	private Administrator admin;
+	private Shopper shopper;
+	private JMenuBar bar;
+	private LoginListener listener;
+	private LogoutListener logoutListener;
+	private ModProdListener modifyProdListener;
+	private BodyListener bodListener;
+	private RegisterListener regListener;
+	private AdminListener aListener;
+	private CustomerListener cListener;
+	private JMenu startMenu, actionMenu, customerMenu;
+    private JMenuItem loginItem, logoutItem, registerItem;
+    private JMenuItem categoryAction, productAction, warehouseAction, quantityAction, routeAction, cityAction, reportAction; //admin actions
+    private JMenuItem addItem, removeItem, changeQuantity, viewCart, viewInvoices; //ShopApp actions
+    private JLabel welcome;
+    private boolean loggedIn, loggedOut;
+    private List<JLabel> prodForSale;
+    private String userType; //Guest/Shopper/Admin
+    JPanel testPanel;
+    JScrollPane testScroll;
+    
+    //private HashMap<JButton, Product> boxes3;
+    private HashMap<JButton, ArrayList<Object>> boxes3, boxInfo;
+    
+	public ShopApp() throws NumberFormatException, IOException {
+		super("CSC207 Shopping App");
+		setContentPane(new JLabel(new ImageIcon("Products\\bg.jpg")));
+		setLayout(new GridLayout(0,3));
+		//testPanel = new JPanel( new GridLayout(0,3));
+		Store store = new Store("testfile.txt");
+		
+		welcome = new JLabel();
+		welcome.setFont(new Font ("Sanserif", Font.ITALIC, 10));
+		welcome.setEnabled(false);
+	    loggedIn = false;
+	    loggedOut = true;
+		prodForSale = new ArrayList<>();
+		
+		
+		boxInfo = new HashMap<JButton, ArrayList<Object>>();
+		modifyProdListener = new ModProdListener();
+		
+		boxes3 = new HashMap<JButton, ArrayList<Object>>();
+		bodListener = new BodyListener();
+		addProducts();
+		
+		for (JButton key: boxes3.keySet()){
+			key.setText("Log in to click");
+		}
+		
+		bar = new JMenuBar();
+		setJMenuBar(bar);
+		
+		setStartMenu();
+		setAdminMenu();
+		actionMenu.setEnabled(false);
+		setCustMenu();
+		customerMenu.setEnabled(false);
+		userType = "Guest";
+		
+		//customerMenu.setEnabled(false);
+		//add(testPanel);
+		//testScroll = new JScrollPane (testPanel);
+		//add(testScroll);
+	}
+	
+	public void setStartMenu(){
+		startMenu = new JMenu("Start");
+		bar.add(startMenu);
+		//startMenu.setEnabled(false);
+		
+		loginItem = new JMenuItem("Log In");
+		loginItem.setMnemonic('I');
+		startMenu.add(loginItem);
+		listener = new LoginListener();
+		loginItem.addActionListener(listener);
+		
+		//Lynn added this
+		registerItem = new JMenuItem("Register");
+		registerItem.setMnemonic('R');
+		registerItem.setEnabled(true);
+		startMenu.add(registerItem);
+		regListener = new RegisterListener();
+		registerItem.addActionListener(regListener);
+		//
+		
+
+		logoutItem = new JMenuItem("Log Out");
+		logoutItem.setMnemonic(KeyEvent.VK_T);
+		logoutItem.setEnabled(false);
+		startMenu.add(logoutItem);
+		logoutListener = new LogoutListener();
+		logoutItem.addActionListener(logoutListener);
+	}
+	
+	public void setAdminMenu(){
+		actionMenu = new JMenu("Administrator actions");
+		bar.add(actionMenu);
+		
+		categoryAction = new JMenuItem("Add Category");
+		actionMenu.add(categoryAction);
+		aListener = new AdminListener();
+		categoryAction.addActionListener(aListener);
+		
+		productAction = new JMenuItem("Add Product");
+		actionMenu.add(productAction);
+		productAction.addActionListener(aListener);
+		
+		warehouseAction = new JMenuItem("Add Warehouse");
+		actionMenu.add(warehouseAction);
+		warehouseAction.addActionListener(aListener);
+		
+		quantityAction = new JMenuItem("Add Product Quantity"); //add product quantity to SPECIFIC warehouse
+		actionMenu.add(quantityAction);
+		quantityAction.addActionListener(aListener);
+		
+		routeAction = new JMenuItem("Add Route"); 
+		actionMenu.add(routeAction);
+		routeAction.addActionListener(aListener);
+		
+		cityAction = new JMenuItem("Add City"); 
+		actionMenu.add(cityAction);
+		cityAction.addActionListener(aListener);
+		
+		reportAction = new JMenuItem("Produce Sales Report"); //produce a sales report
+		actionMenu.add(reportAction);
+		reportAction.addActionListener(aListener);
+	}
+	
+	public void setCustMenu(){
+		customerMenu = new JMenu("Customer actions");
+		bar.add(customerMenu);
+		
+		cListener = new CustomerListener();
+		
+		removeItem = new JMenuItem("Remove Item from Cart");
+		customerMenu.add(removeItem);
+		removeItem.addActionListener(cListener);
+		
+		changeQuantity = new JMenuItem("Change Item Quantity");
+		customerMenu.add(changeQuantity);
+		changeQuantity.addActionListener(cListener);
+		
+		viewCart = new JMenuItem("View Items in Cart");
+		customerMenu.add(viewCart);
+		viewCart.addActionListener(cListener);
+		
+		viewInvoices = new JMenuItem("View Invoices");
+		customerMenu.add(viewInvoices);
+		viewInvoices.addActionListener(cListener);
+	}
+	
+	public boolean hasLoggedOut() {
+		return loggedOut;
+	}
+	
+	private class RegisterListener implements ActionListener {
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			//TODO
+			//need to finish
+			
+			JTextField newUsername = new JTextField();
+			JTextField newPassword = new JPasswordField();
+			String[] types = new String[] {"Admin", "Shopper"};
+			JComboBox<Object> type = new JComboBox<Object>(types);
+			Object[] message = {
+			    "Enter desired username:", newUsername,
+			    "Enter desired password:", newPassword,
+			    "Register as:", type
+			};
+	        //boolean result = false;
+			int option = JOptionPane.showConfirmDialog(null, message, "Register new user", JOptionPane.OK_CANCEL_OPTION);
+			if (option == JOptionPane.OK_OPTION) {
+				if (type.getSelectedItem().equals("Shopper")){
+					//create shopper
+					ArrayList<City> cityChoices = Graph.getCities();
+					
+					ArrayList<String> cNames = new ArrayList<String>();
+					for(City city : cityChoices){
+						cNames.add(city.getName());
+					}
+					
+					String[] cityNames = new String[cNames.size()];
+					for(int i = 0; i < cNames.size(); i++) {
+						cityNames[i] = cNames.get(i);
+					}
+					JComboBox<Object> cityList = new JComboBox<Object>(cityNames);
+					
+					JTextField shopperAddress = new JTextField();
+					
+					Object[] message2 = {
+						"Enter your address:", shopperAddress,
+					    "Select your city:", cityList,
+					};
+			        //boolean result = false;
+					int option2 = JOptionPane.showConfirmDialog(null, message2, "Additional shopper information", JOptionPane.OK_CANCEL_OPTION);
+					if (option2 == JOptionPane.OK_OPTION) {
+						
+					} 	
+				}
+				//create admin, otherwise
+			}
+		}
+	}
+	
+	private class LogoutListener implements ActionListener { //Lynn added this entire Listener
+		public void actionPerformed(ActionEvent arg0) {
+			loginItem.setEnabled(true);
+			registerItem.setEnabled(true);
+			logoutItem.setEnabled(false);
+			loggedIn = false;
+			loggedOut = true;
+			bar.remove(4); //removes admin/customer buttons from header
+			//2 second button
+			//3 glue
+			//4 welcome (name)
+			
+			actionMenu.setEnabled(false);
+			customerMenu.setEnabled(false);
+			
+			
+			for (JButton key: boxes3.keySet()){
+				key.setText("Log in to click");
+			}
+			
+			userType = "Guest";
+			revalidate();
+			
+		}
+	}
+	
+	private class AdminListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			System.out.println(arg0.getActionCommand()); //returns name of JMenuItem eg String "Add Category;
+			
+			
+			if (arg0.getActionCommand().equals("Add Category")){
+				//just connect to backend
+				JTextField newCategory = new JTextField();
+				Object[] message = {
+				    "Type in name for new category:", newCategory,
+				};
+				
+				int option = JOptionPane.showConfirmDialog(null, message, "Add category", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+				    String categoryName = newCategory.getText();
+				    //connect to backend
+				}
+			}
+			else if (arg0.getActionCommand().equals("Add Product")){
+				ArrayList<String> cNames = new ArrayList<String>(); //DO THIS BUT WITH CATEGORY OPTIONS
+				//where is the category list
+				cNames.add("31000001");
+				String[] catNames = new String[cNames.size()];
+				for(int i = 0; i < cNames.size(); i++) {
+    				catNames[i] = cNames.get(i);
+				}
+				JComboBox<Object> catList = new JComboBox<Object>(catNames);
+				JTextField imageFileName = new JTextField();
+				JTextField prodName = new JTextField();
+				JTextArea pD = new JTextArea(3,1);
+				JScrollPane prodDescription = new JScrollPane(pD);
+				JTextField prodPrice = new JTextField();
+				
+				Object[] message = {
+					"Choose product category:", catList,
+					"Enter image filename:", imageFileName,
+					"Enter name for product:", prodName,
+				    
+				    "Enter product description:", prodDescription,
+				    "Enter product price:", prodPrice
+				};
+		     
+				int option = JOptionPane.showConfirmDialog(null, message, "Add product", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					String newProdCat = (String) catList.getSelectedItem(); //TODO CHANGE THIS
+					String newProdFileName = imageFileName.getText();
+					String newProdName = prodName.getText();
+					String newProdDesc = pD.getText();
+					Double newProdPrice = Double.parseDouble(prodPrice.getText());
+					Product newProduct = new Product(new Category("AShirts", 31000000), newProdFileName, newProdName, newProdDesc, newProdPrice);
+					addNewProducts(newProduct);
+					for (JButton key: boxes3.keySet()){
+						key.setText("Modify product");
+					}
+					revalidate();
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Add Warehouse")){
+				//should be good with edited graph.java
+				
+				//TODO //check: made the function opposite of getdistributioncenters()
+				ArrayList<City> cityChoices = Graph.getNonDistCenters();
+				ArrayList<String> cNames = new ArrayList<String>();
+				for(City city : cityChoices){
+					cNames.add(city.getName());
+				}
+				
+				String[] cityNames = new String[cNames.size()];
+				for(int i = 0; i < cNames.size(); i++) {
+					cityNames[i] = cNames.get(i);
+				}
+				JComboBox<Object> cityList = new JComboBox<Object>(cityNames);
+				
+				Object[] message = {
+				    "Choose new warehouse location:", cityList
+				};
+				
+				int option = JOptionPane.showConfirmDialog(null, message, "Add warehouse location", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					City selectedCity = cityChoices.get(cNames.indexOf(cityList.getSelectedItem()));
+					selectedCity.distribution = true;
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Add Product Quantity")){
+				//should be good once we make graph stuff static
+				
+				ArrayList<Product> availableProducts = new ArrayList<Product>();
+		
+				for(Map.Entry<JButton, ArrayList<Object>> item : boxes3.entrySet()){
+				    Product anItem = (Product) item.getValue().get(0);
+				    availableProducts.add(anItem);
+				}
+				
+				ArrayList<String> pNames = new ArrayList<String>();
+				
+				for (Product p : availableProducts){
+					pNames.add(p.getName());
+				}
+				
+				String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+
+				//---------------------------------------------------------------
+				
+				//TODO //make graph functions static?
+				ArrayList<City> warehouseChoices = Graph.getDistributionCenters();
+				ArrayList<String> wNames = new ArrayList<String>();
+				for(City warehouse : warehouseChoices){
+					wNames.add(warehouse.getName());
+				}
+				
+				String[] warehouseNames = new String[wNames.size()];
+				for(int i = 0; i < wNames.size(); i++) {
+					warehouseNames[i] = wNames.get(i);
+				}
+				JComboBox<Object> warehouseList = new JComboBox<Object>(warehouseNames);
+				//=====================================================
+				JTextField prodAmount = new JTextField(warehouseChoices.get(wNames.indexOf(warehouseList.getSelectedItem())).getName());
+				//TODO show admin quantity 
+				Object[] message = {
+					"Choose product to replenish:", productList,
+				    "Choose warehouse:", warehouseList,
+				    "Enter quantity to add (integer):", prodAmount
+				};
+				
+				int option = JOptionPane.showConfirmDialog(null, message, "Add warehouse location", JOptionPane.OK_CANCEL_OPTION);
+				//prodAmount.setText(warehouseChoices.get(wNames.indexOf(warehouseList.getSelectedItem())).getName());
+				//revalidate();
+				if (option == JOptionPane.OK_OPTION) {
+					int amountAdded = Integer.parseInt(prodAmount.getText());
+					Product chosenProduct = availableProducts.get(pNames.indexOf(productList.getSelectedItem()));
+					System.out.println(chosenProduct.getName());
+					
+					//connect to backend
+					
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Add Route")){
+				//should be good with edited Graph.java
+				ArrayList<City> cityChoices = Graph.getCities();
+				
+				ArrayList<String> cNames = new ArrayList<String>();
+				for(City city : cityChoices){
+					cNames.add(city.getName());
+				}
+				
+				String[] cityNames = new String[cNames.size()];
+				for(int i = 0; i < cNames.size(); i++) {
+					cityNames[i] = cNames.get(i);
+				}
+				JComboBox<Object> cityAList = new JComboBox<Object>(cityNames);
+				JComboBox<Object> cityBList = new JComboBox<Object>(cityNames);
+
+				JTextField distance = new JTextField();
+				
+				
+				Object[] message = {
+					"Choose map point A:", cityAList,
+					"Choose map point B:", cityBList,
+				    "Enter distance:", distance
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add warehouse location", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					if(!(cityAList.getSelectedItem().equals(cityBList.getSelectedItem()))){ //checks if cities chosen are different
+						
+						City cityA = cityChoices.get(cNames.indexOf(cityAList.getSelectedItem()));
+						City cityB = cityChoices.get(cNames.indexOf(cityBList.getSelectedItem()));
+						int travelDistance = Integer.parseInt(distance.getText());
+						
+						if(!(cityA.cityConnections.containsKey(cityB))){ //checks if connection already exists
+							//if doesn't exist, it is put
+							cityA.cityConnections.put(cityB, travelDistance);
+							cityB.cityConnections.put(cityA, travelDistance);
+						}
+					}
+					
+					else {
+						JOptionPane.showMessageDialog(null, "You can't add a route to the same cities, silly!");
+					}
+				} 
+			}
+			
+			else if (arg0.getActionCommand().equals("Add City")){
+				//TODO connect to backend
+				//should be good 
+				
+				String[] options = new String[]{"Yes", "No"};
+				JComboBox<Object> isDistCenter = new JComboBox<Object>(options);
+
+				JTextField newCityName = new JTextField();
+				
+				Object[] message = {
+					"Enter name for city:", newCityName,
+					"Is this a distribution center?:", isDistCenter
+				    
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add new city", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					boolean distribution = false;
+					if(isDistCenter.getSelectedItem().equals("Yes")){
+						distribution = true;
+					}
+					
+					String cityName = newCityName.getText();
+					City brandNewCity = new City(cityName, distribution); //TODO //add to database
+				} 
+			}
+			
+			else if (arg0.getActionCommand().equals("Produce Sales Report")){
+				
+			}
+			
+		}
+	}
+	
+	private class CustomerListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			System.out.println(arg0.getActionCommand()); //returns name of JMenuItem eg String "Add Category;
+			
+			if (arg0.getActionCommand().equals("Remove Item from Cart")){
+				ArrayList<String> pNames = new ArrayList<String>();
+				pNames.add("p1");
+				String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+
+				JTextField desiredQuantity = new JTextField();
+				Object[] message = {
+					"Choose product to remove:", productList,
+				    "Enter quantity to remove (integer):", desiredQuantity
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Remove item from cart", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+				
+				} 
+			}
+			else if (arg0.getActionCommand().equals("Change Item Quantity")){
+				//TODO
+				//NEED TO FIX THIS
+				ArrayList<Product> availableProducts = new ArrayList<Product>();
+				
+				
+				for(Map.Entry<JButton, ArrayList<Object>> item : boxes3.entrySet()){
+				    Product anItem = (Product) item.getValue().get(0);
+				    availableProducts.add(anItem);
+				}
+				
+
+
+
+				
+				
+				
+				/*String[] productNames = new String[pNames.size()];
+				for(int i = 0; i < pNames.size(); i++) {
+    				productNames[i] = pNames.get(i);
+				}
+				JComboBox<Object> productList = new JComboBox<Object>(productNames);
+
+				JTextField desiredQuantity = new JTextField();
+				Object[] message = {
+					"Choose product in cart:", productList, //SHOULD SHOW CURRENT AMOUNT?
+				    "Enter new quantity (integer):", desiredQuantity
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Change item quantity", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} */
+			}
+			else if (arg0.getActionCommand().equals("View Items in Cart")){
+				JFrame myCart = new JFrame();
+				myCart.setTitle("View cart");
+				myCart.setLayout(new GridLayout(0,3));
+				myCart.setSize(600, 400);
+				
+				HashMap<Product, Integer> inCart = shopper.getCart();
+				
+				ArrayList<Product> products = new ArrayList<Product>();
+				ArrayList<Integer> amount = new ArrayList<Integer> ();
+				
+				
+				//HashMap<JButton, ArrayList<Object>> boxInfo = new HashMap<JButton, ArrayList<Object>>(); //like boxes3
+				
+				
+				
+				for(Map.Entry<Product, Integer> entry : inCart.entrySet()){
+				    //System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
+					products.add(entry.getKey());
+					amount.add(entry.getValue());
+				}
+				
+				for (Product p : products){
+					JLabel prod = new JLabel();
+					JLabel box2 = new JLabel();
+					JButton box3 = new JButton();
+					ImageIcon prodImage = new ImageIcon("Images\\"+p.getImage());
+					prod.setIcon(prodImage);
+					prod.setText(p.getName());
+					prod.setHorizontalTextPosition(JLabel.CENTER);
+					prod.setVerticalTextPosition(JLabel.BOTTOM);
+					
+					box2.setText(String.valueOf(amount.get(products.indexOf(p))));
+					box3.setText("Change item quantity");
+					myCart.add(prod);
+					myCart.add(box2);
+					myCart.add(box3);
+					box3.addActionListener(modifyProdListener);
+					ArrayList<Object> box = new ArrayList<Object>();
+					box.add(p);
+					box.add(prod);
+					box.add(box2);
+					boxInfo.put(box3, box);
+					
+				}
+				
+				myCart.setResizable(true);
+				myCart.setVisible(true);
+				
+				/*for(Map.Entry<JButton, ArrayList<Object>> entry : boxInfo.entrySet()){
+				    JButton pressedButton = entry.getKey();
+				    if(pressedButton.getModel().isPressed()){
+				    	System.out.println("pressed");
+				    }
+				}*/
+				
+				
+				//JOptionPane.showMessageDialog(null,myCart,"Information",JOptionPane.INFORMATION_MESSAGE);
+			     
+				/*int option = JOptionPane.showConfirmDialog(null, message, "View items in cart", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} */
+				
+				
+				/*JLabel prod, box2;
+        JButton box3;
+		ImageIcon prodImage = new ImageIcon("Images\\"+p.getImage());
+		String prodDescription = writeProdDescription(p);
+		
+		prod = new JLabel();
+		box2 = new JLabel();
+		box3 = new JButton();
+		prod.setIcon(prodImage);
+		prod.setText(p.getName());
+		prod.setHorizontalTextPosition(JLabel.CENTER);
+		prod.setVerticalTextPosition(JLabel.BOTTOM);
+		prod.setToolTipText("Login to buy products!");
+		box2.setText(prodDescription);
+		add(prod);
+		add(box2);
+		add(box3);
+		box3.addActionListener(bodListener);
+		prodForSale.add(prod);
+		
+		//boxes3.add(box3);
+		ArrayList<Object> boxes3info = new ArrayList<Object>();
+		boxes3info.add(p);
+		boxes3info.add(prod);
+		boxes3info.add(box2);
+		//boxes3.put(box3, p);
+		boxes3.put(box3, boxes3info);*/
+				
+			
+				
+				
+				
+				
+				
+				
+				
+				
+			}
+			
+			else if (arg0.getActionCommand().equals("View Invoices")){
+				//done!
+				
+				HashMap<Integer, Invoice> invoice = shopper.getAllInvoices();
+				
+				ArrayList<Integer> invoiceNums = new ArrayList<Integer>();
+				
+				for(Map.Entry<Integer, Invoice> entry : invoice.entrySet()){
+				    //System.out.printf("Key : %s and Value: %s %n", entry.getKey(), entry.getValue());
+				    invoiceNums.add(entry.getKey());
+				}
+				
+				Integer[] invoiceNumbers = new Integer[invoiceNums.size()];
+				for(int i = 0; i < invoiceNums.size(); i++) {
+					invoiceNumbers[i] = invoiceNums.get(i);
+				}
+				
+				JComboBox<Object> invoiceChoices= new JComboBox<Object>(invoiceNumbers);
+				
+				Object[] message = {
+						"Choose invoices to view:", invoiceChoices
+					};
+
+					int option = JOptionPane.showConfirmDialog(null, message, "View invoices", JOptionPane.OK_CANCEL_OPTION);
+					if (option == JOptionPane.OK_OPTION) {
+						Invoice selectedInvoice = shopper.getInvoice((int) invoiceChoices.getSelectedItem());
+						String invoiceMessage = selectedInvoice.toString();
+						
+						JOptionPane.showMessageDialog(null, invoiceMessage);
+					} 
+			}
+		}
+	}
+	
+	private class ModProdListener implements ActionListener {
+		@Override 
+		public void actionPerformed(ActionEvent arg0){
+			JButton clickedButton = (JButton) arg0.getSource();
+			//System.out.println(boxInfo.get(clickedButton).toString());
+			Product prodFromButton = (Product) boxInfo.get(clickedButton).get(0);
+			System.out.println(prodFromButton.getName());
+			int oldQuantity = shopper.getCart().get(prodFromButton);
+			
+			JLabel instructions = new JLabel("Input new quantity (0 to remove)");
+			JLabel productName = new JLabel(prodFromButton.getName());
+			JLabel productDesc = new JLabel(prodFromButton.getDescription());
+			JLabel productPrice = new JLabel(String.valueOf(prodFromButton.getPrice()));
+			JTextField newQuantity = new JTextField(shopper.getCart().get(prodFromButton));
+			Object[] message = {
+					"Modify cart.", instructions,
+					"Product name:", productName,
+					"Product description:", productDesc,
+				    "Product price: $", productPrice,
+				    "Enter desired quantity (0 to remove):", newQuantity
+				};
+			int option = JOptionPane.showConfirmDialog(null, message, "Modify product info", JOptionPane.OK_CANCEL_OPTION);
+			if (option == JOptionPane.OK_OPTION) {
+				int changedQuantity = Integer.parseInt(newQuantity.getText());
+				shopper.getCart().put(prodFromButton, changedQuantity);
+				
+				if (shopper.getCart().get(prodFromButton) == 0){
+					
+					boxInfo.remove(prodFromButton);
+					try {
+						shopper.removeFromCart(prodFromButton, oldQuantity);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					//myCart.remove()
+				}
+				((JLabel) boxInfo.get(clickedButton).get(2)).setText(String.valueOf(shopper.getCart().get(prodFromButton))); //changes name
+				revalidate();
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	private class BodyListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0){
+			JButton clickedButton = (JButton) arg0.getSource();
+			Product prodFromButton = (Product) boxes3.get(clickedButton).get(0);
+			System.out.println(prodFromButton.getName());
+			if (userType.equals("Guest")){
+				System.out.println("log in to use this");
+			}
+			else if (userType.equals("Admin")){
+				System.out.println("Admin bodyListener");
+						
+				JLabel instructions = new JLabel("Leave blank if no change is desired.");
+				JTextField newProdName = new JTextField(prodFromButton.getName());
+				JTextArea pD = new JTextArea(prodFromButton.getDescription(),3,1);
+				JScrollPane newProdDesc = new JScrollPane(pD);
+				String oldPrice = Double.toString(prodFromButton.getPrice());
+				JTextField newProdPrice = new JTextField(oldPrice);
+			
+				Object[] message = {
+					"Modify Product.", instructions,
+					"Change product name:", newProdName,
+					"Change product description:", newProdDesc,
+				    "Change product price (double):", newProdPrice
+				};
+		    
+				int option = JOptionPane.showConfirmDialog(null, message, "Modify product info", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					prodFromButton.setName(newProdName.getText());
+					((JLabel) boxes3.get(clickedButton).get(1)).setText(prodFromButton.getName()); //changes name
+					
+					prodFromButton.setDescription(pD.getText());
+						
+					double priceValue = Double.parseDouble(newProdPrice.getText());
+					prodFromButton.setPrice(priceValue);
+					String prodDescription = writeProdDescription(prodFromButton);
+				
+					((JLabel) boxes3.get(clickedButton).get(2)).setText(prodDescription); //changes name
+			
+				} 	
+			}
+			else if (userType.equals("Shopper")){
+				System.out.println("Shopper BodyListener");
+				
+				JLabel prodName = new JLabel(prodFromButton.getName());
+				JTextField desiredQuantity = new JTextField();
+				Object[] message = {
+					"Product:", prodName,
+				    "Enter desired quantity (integer):", desiredQuantity
+				};
+		        //boolean result = false;
+				int option = JOptionPane.showConfirmDialog(null, message, "Add item to cart", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION) {
+					
+				} 
+			
+			}
+			revalidate();
+		}
+	}
+
+	private class LoginListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			try {
+				User user = login();
+				if(user != null) {
+					int sessionID = user.getSessionID();
+					loginItem.setEnabled(false);
+					registerItem.setEnabled(false); //Lynn added this
+					logoutItem.setEnabled(true);
+					loggedIn = true;
+					loggedOut = false;
+					if (Store.isAdmin(sessionID)) {
+						actionMenu.setEnabled(true);	
+						userType = "Admin";
+						admin = (Administrator) Store.getsessionIDList().get(sessionID);
+						for (JButton key: boxes3.keySet()){
+							key.setText("Modify product");
+						}
+					}
+					else if (Store.isShopper(sessionID)) {
+						customerMenu.setEnabled(true);		
+						userType = "Shopper";
+						shopper = (Shopper) Store.getsessionIDList().get(sessionID);
+						
+						for (JButton key: boxes3.keySet()){
+							key.setText("Add to cart");
+						}
+					}
+								
+					//Lynn added this--end
+					
+					bar.add(add(Box.createHorizontalGlue()));
+					bar.add(welcome);
+					for(JLabel l : prodForSale)
+						l.setToolTipText("Add to shopping cart!");
+					revalidate();
+					
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private User login() throws IOException {
+		
+		JTextField username = new JTextField();
+		JTextField password = new JPasswordField();		
+		
+		Object[] message = {
+		    "Username:", username,
+		    "Password:", password
+		};
+		User user = null;
+		int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
+		if (option == JOptionPane.OK_OPTION) {
+			String name = username.getText();
+			String pw = new String(((JPasswordField) password).getPassword());
+			System.out.println("NAME: " + name + " PASS: " + pw);
+			user = Store.login(username.getText(), new String(((JPasswordField) password).getPassword()));
+		    if(user != null)
+		    	welcome.setText("Welcome, " + username.getText() + "!  ");
+		    
+		    revalidate();
+		   
+		} else {
+		    return null;
+		}
+		return user;
+	}
+	
+	private void addProducts() { //loads products from file
+		Collection<Product> products = Store.getProductList().values();
+        
+		for(Product p : products) {
+			
+			addNewProducts(p);
+			revalidate();
+		}
+	}
+	
+	private void addNewProducts(Product p) {
+		JLabel prod, box2;
+        JButton box3;
+		ImageIcon prodImage = new ImageIcon("Images\\"+p.getImage());
+		String prodDescription = writeProdDescription(p);
+		
+		prod = new JLabel();
+		box2 = new JLabel();
+		box3 = new JButton();
+		prod.setIcon(prodImage);
+		prod.setText(p.getName());
+		prod.setHorizontalTextPosition(JLabel.CENTER);
+		prod.setVerticalTextPosition(JLabel.BOTTOM);
+		prod.setToolTipText("Login to buy products!");
+		box2.setText(prodDescription);
+		add(prod);
+		add(box2);
+		add(box3);
+		box3.addActionListener(bodListener);
+		prodForSale.add(prod);
+		
+		//boxes3.add(box3);
+		ArrayList<Object> boxes3info = new ArrayList<Object>();
+		boxes3info.add(p);
+		boxes3info.add(prod);
+		boxes3info.add(box2);
+		//boxes3.put(box3, p);
+		boxes3.put(box3, boxes3info);
+	}
+	
+	private String writeProdDescription(Product p){
+		String prodDescription = "<html>";
+		prodDescription += "$" + p.getPrice() + "<br>";
+		prodDescription += "Quantity: " + p.getQuantity() + "<br>";
+		prodDescription += p.getDescription() + "<br></html>";
+		return prodDescription;
+	}
+}

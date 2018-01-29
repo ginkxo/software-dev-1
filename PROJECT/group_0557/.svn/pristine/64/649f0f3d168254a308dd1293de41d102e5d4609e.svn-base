@@ -1,0 +1,22 @@
+package finalproject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class UserManager {
+
+	private List<User> users;
+	
+	public UserManager() {
+		users = new ArrayList<>();
+		// load existing users
+		// we will fake one user for testing purposes
+		User user = new User("Ilir","pass");
+		users.add(user);
+	}
+	
+	public boolean validate(User u) {
+		return users.contains(u);
+	}
+	
+}

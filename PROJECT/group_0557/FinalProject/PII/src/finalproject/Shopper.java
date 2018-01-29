@@ -1,0 +1,211 @@
+package finalproject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Represents a Shopper user that exists in the Store's database.
+ *
+ */
+public class Shopper extends User {
+	private HashMap<Integer, Invoice> invoices = new HashMap<Integer, Invoice>();
+	protected HashMap<Product, Integer> cart;
+	private String address = "";
+	private City city;
+	private String realName = "";
+
+	/**
+	 * Default constructor to build a Shopper object from scratch.
+	 */
+	public Shopper(String userName, String password) {
+		this.userName = userName;
+		this.password = password;
+		invoices = new HashMap<Integer, Invoice>();
+		cart = new HashMap<Product, Integer>();
+	}
+
+	/**
+	 * Constructor to reconstruct a shopper object from the CSV database.
+	 * @param userName
+	 * @param password
+	 * @param city -> City object representing the city the shopper lives in
+	 * @param address -> Street address of the shopper
+	 * @param UserID
+	 * @param cart
+	 */
+	public Shopper(String userName, String password, City city, String address, int userID, HashMap<Product, Integer> cart) {
+		this.userName = userName;
+		this.password = password;
+		this.city = city;
+		this.address = address;
+		this.userID = userID;
+		this.cart = cart; //TODO Do we need to do an iterator for memory address purposes?
+	}
+
+	public Invoice getInvoice(int ID) {
+		return invoices.get(ID);
+	}
+
+	public String getUsername() {
+		return this.userName;
+	}
+
+	/**
+	 * Attempts to adds some quantity of a product to the user's cart.
+	 * @param product
+	 * @param quantity
+	 * @return true is successful, false otherwise.
+	 * @throws IOException
+	 */
+	public boolean addToCart(Product product, int quantity) throws IOException {
+		if (product.getQuantity() < quantity) {
+			return false;
+		}
+		if (cart.containsKey(product)){
+			cart.replace(product, cart.get(product) + quantity);
+			}
+		else {
+				cart.put(product, quantity);
+			}
+		product.setQuantity(product.getQuantity() - quantity);
+		return true;
+	}
+
+	/**
+	 * Same as addToCart, but also updates the user CSV. Separate 
+	 * @param product
+	 * @param quantity
+	 * @throws IOException 
+	 */
+	public void addToCartandUpdate(Product product, int quantity) throws IOException{
+		if (addToCart(product, quantity)) Store.getDBManager().updateUser(this);
+	}
+
+	/**
+	 * Attempts to purchase a given quantity of a given product immediately, bypassing 
+	 * the shopper's cart completely.
+	 * @param product
+	 * @param quantity
+	 * @return -> The orderID if successful, -1 otherwise.
+	 * @throws IOException
+	 */
+	public int buyItNow(Product product, int quantity) throws IOException {
+		if (quantity <= product.getQuantity() && city != null && address != null && Store.graph.getBestDistributionCenter(city) != null)
+		{
+			HashMap<Product, Integer> tempCart = new HashMap<Product, Integer>();
+			tempCart.put(product,  quantity);
+			// never reserved quantity
+			product.setQuantity(product.getQuantity() - quantity);
+			int orderID = purchase(tempCart);
+			Store.getDBManager().updateUser(this);
+			return orderID;			
+		}
+		return -1;
+	}
+
+	/**
+	 * Removes the specific quantity of a certain product from the Shopper's cart.
+	 * @param product -> The product to remove
+	 * @param quantity -> The amount that needs to be removed
+	 * @throws IOException 
+	 */
+	public void removeFromCart(Product product, int quantity) throws IOException{
+		if (cart.containsKey(product)){
+			if (cart.get(product) <= quantity) cart.remove(product);
+			else {cart.put(product, cart.get(product) - quantity);}
+			product.setQuantity(product.getQuantity() + quantity);
+			Store.getDBManager().updateUser(this);
+		}
+	}
+	
+	/**
+ 	 * Prints to console the items and their quantities from the Shopper's cart. 
+	 */
+	public void viewCart(){
+		if (!cart.isEmpty()) {
+			System.out.println("Your cart contains:");
+			for(Map.Entry<Product, Integer> entry : cart.entrySet()) //http://stackoverflow.com/questions/9371667/foreach-loop-in-java-for-dictionary
+			{
+				System.out.println(entry.getKey().getName() + ": " + entry.getValue());
+			}
+			System.out.println("");
+		} else {System.out.println("your cart is empty!");}
+	}
+
+	/**
+	 * An attempt to purchase the items in the user's cart.
+	 * @return The orderID if successful, -1 otherwise.
+	 * @throws IOException
+	 */
+	public int checkOut() throws IOException{
+		//TODO ensure it still works if a second user buys the items first
+		if (!cart.isEmpty() && city != null && address != null && Store.graph.getBestDistributionCenter(city) != null) {
+			// We will successfully check out now.
+			int orderID = purchase(cart);
+			cart.clear();
+			Store.getDBManager().updateUser(this);
+			return orderID;
+		}
+		// Cart was empty, no purchase was made
+		return -1;
+	}
+
+	private int purchase(HashMap<Product, Integer> cart) throws IOException {
+		Invoice invoice = new Invoice(cart, this);
+		if (invoice.getInvoiceID() > 0) {
+			//TODO
+			//Store.getDBManager().addInvoice(invoice);
+			invoices.put(invoice.getInvoiceID(), invoice);
+			return invoice.getInvoiceID();
+		}
+		return -1;
+	}
+
+	/**
+	 * A console print-out of the shopper's invoices.
+	 */
+	public void viewInvoices(){
+		for (Invoice i : invoices.values()) System.out.println(i);
+	}
+
+	public City getCity() {
+		return city;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+    public HashMap<Product, Integer> getCart() {
+        return cart;
+    }
+
+	public String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public void setCity(City city) {
+		this.city = city;
+	}
+
+	/**
+	 * A formatted string of the Shopper's cart contents.
+	 * @return The shopper's cart contents.
+	 */
+    public String printCart() {
+    	String str = this.getUserName() + "'s cart contains:\n";
+    	for (Product p : this.getCart().keySet()) {
+    		str += p.getName() + ": " + this.getCart().get(p) + "\n";
+    	}
+    	return str;
+    }
+}

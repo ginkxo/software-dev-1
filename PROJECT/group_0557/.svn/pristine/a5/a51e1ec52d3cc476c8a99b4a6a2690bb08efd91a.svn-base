@@ -1,0 +1,27 @@
+package finalproject;
+
+import java.util.HashMap;
+import java.util.Map.Entry;
+
+public class City {
+	protected String name;
+	protected boolean distribution;
+	protected HashMap<City, Integer> cityConnections;
+	
+
+    public City(String name, boolean distribution) {
+    	this.name = name;
+    	this.distribution = distribution;
+    	this.cityConnections = new HashMap<City, Integer>();
+    }
+
+    public void showEdges(){
+    	for(Entry<City, Integer> connection : cityConnections.entrySet()) //http://stackoverflow.com/questions/9371667/foreach-loop-in-java-for-dictionary
+			{
+				System.out.println(connection.getKey().getName() + ": " + connection.getValue());
+			}
+    }
+    public String getName() {
+    	return name;
+    }
+}

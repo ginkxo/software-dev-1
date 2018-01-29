@@ -1,0 +1,303 @@
+package world;
+
+import heap.Heap;
+import heap.HeapEmptyException;
+import heap.HeapFullException;
+
+import java.util.*;
+
+import java.lang.Math;
+
+//TODO: retracePath(), getTreasure() and getBoat() are never used...
+//TODO: verify that getNeighbours(), findPath(), move() and getTreasure() are correct
+
+//TODO: getNeighbours() - pretty sure it's correct
+//TODO: findPath() - it should somehow link to TreasureHunt#pathLength() because that returns 0...
+//TODO: move() - maybe when the boat moves, you need to set the boat's old location to walkable = true?
+//TODO: getTreasure() - handle the null case to deal with NullPointerException that might break the game...
+
+public class Grid {
+
+    private final int DEFAULT_WIDTH = 60; // default width of the world map - gridX runs from 0 to 59
+    private final int DEFAULT_HEIGHT = 15; // default height of the map - gridY runs from 0 to 14
+    private final int DEFAULT_PERCENT = 20; // this is the percentage of the map occupied by islands
+    protected int width, height; // user defined width and height, if one is not using defaults
+    protected int percent; // user defined percentage of islands on the map
+    protected Node treasure; // points to the map node where the Redbeard treasure is sunken
+    protected Node boat; // points to the current location of our boat on the map
+
+    protected Node[][] map; // the map
+
+    public Grid() throws HeapFullException, HeapEmptyException {
+        width = DEFAULT_WIDTH;
+        height = DEFAULT_HEIGHT;
+        percent = DEFAULT_PERCENT;
+        buildMap();
+    }
+
+    public Grid(int width, int height, int percent) throws HeapFullException, HeapEmptyException {
+        this.width = width;
+        this.height = height;
+        if (percent <= 0 || percent >= 100)
+            this.percent = DEFAULT_PERCENT;
+        else
+            this.percent = percent;
+        buildMap();
+    }
+
+    private void buildMap() throws HeapEmptyException, HeapFullException {
+        // Your implementation goes here
+        // For each map position (i,j) you need to generate a Node with can be navigable or it may belong to an island
+        // You may use ideas from Lab3 here.
+        // Don't forget to generate the location of the boat and of the treasure; they must be on navigable waters, not on the land!
+        map = new Node[this.height][this.width];
+
+        int islandNumber = (int) (Math.round((this.width * this.height) * (this.percent / 100.0)));
+
+        for (int i = 0; i < this.height; i++) {
+            for (int j = 0; j < this.width; j++) {
+                map[i][j] = new Node(true, i, j);
+            }
+        }
+
+        Random rand1 = new Random();
+
+        //Randomly Plot the Islands
+        while (islandNumber > 0) {
+
+            int yval = rand1.nextInt(this.height);
+            int xval = rand1.nextInt(this.width);
+
+            if (map[yval][xval].walkable) {
+                map[yval][xval].walkable = false;
+                islandNumber = islandNumber - 1;
+            }
+        }
+
+        Random rand2 = new Random();
+
+        //Generate new Treasure Node
+        int treasureSetY = rand2.nextInt(this.height);
+        int treasureSetX = rand2.nextInt(this.width);
+
+        while (!map[treasureSetY][treasureSetX].walkable) {
+            treasureSetY = rand2.nextInt(this.height);
+            treasureSetX = rand2.nextInt(this.width);
+        }
+
+        treasure = new Node(true, treasureSetX, treasureSetY); //treasure doesn't have to be walkable
+
+        //Generate new Boat Node
+        int boatSetY = rand2.nextInt(this.height);
+        int boatSetX = rand2.nextInt(this.width);
+
+        while (!map[boatSetY][boatSetX].walkable) {
+            boatSetY = rand2.nextInt(this.height);
+            boatSetX = rand2.nextInt(this.width);
+        }
+
+        boat = new Node(true, boatSetX, boatSetY); //boat doesn't have to be walkable
+
+    }
+
+
+    public String drawMap() {
+        // provided for your convenience
+        String result = "";
+        String hline = "       ";
+        String extraSpace;
+        for (int i = 0; i < width / 10; i++)
+            hline += "         " + (i + 1);
+        result += hline + "\n";
+        hline = "       ";
+        for (int i = 0; i < width; i++)
+            hline += (i % 10);
+        result += hline + "\n";
+        for (int i = 0; i < height; i++) {
+            if (i < 10)
+                extraSpace = "      ";
+            else
+                extraSpace = "     ";
+            hline = extraSpace + i;
+            for (int j = 0; j < width; j++) {
+                if (i == boat.gridY && j == boat.gridX) {
+                    hline += "B";
+                } else if (i == treasure.gridY && j == treasure.gridX) {
+                    hline += "T";
+                } else if (map[i][j].inPath) {
+                    hline += "*";
+                } else if (map[i][j].walkable) {
+                    hline += ".";
+                } else {
+                    hline += "+";
+                }
+            }
+            result += hline + i + "\n";
+        }
+        hline = "       ";
+        for (int i = 0; i < width; i++)
+            hline += (i % 10);
+        result += hline + "\n";
+        return result;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getPercent() {
+        return percent;
+    }
+
+    public Node getBoat() {
+        return boat;
+    }
+
+    private ArrayList<Node> getNeighbours(Node node) {
+        // each node has at most 8 neighbours
+        // Lab3 may be useful here as well
+
+        // XXX
+        // X X
+        // XXX
+        // is the format of adjacent nodes
+        // xc contains a list of possible x coords nearby
+        // yc contains a list of possible y coords nearby
+        // we iterate through every combination and if it's in the bounds
+        // and not the node itself, then we add the node to the list
+        ArrayList<Node> neighbours = new ArrayList<>();
+
+        int localX = node.gridX;
+        int localY = node.gridY;
+
+        int xc[] = {localX - 1, localX, localX + 1};
+        int yc[] = {localY - 1, localY, localY + 1};
+
+        // XXX
+        // X X
+        // XXX
+        // is the format of adjacent nodes
+        // xc contains a list of possible x coords nearby
+        // yc contains a list of possible y coords nearby
+        // we iterate through every combination and if it's in the bounds
+        // and not the node itself, then we add the node to the list
+        // NOTE: do we add only walkable nodes?
+
+        for (int y : yc) {
+            for (int x : xc) {
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    if (x == node.gridX && y == node.gridY) {
+                        continue;
+                    } else {
+                        neighbours.add(map[y][x]);
+
+                    }
+                }
+            }
+        }
+
+        return neighbours;
+    }
+
+
+    private int getDistance(Node nodeA, Node nodeB) {
+        // helper method. Provided for your convenience.
+        int dstX = Math.abs(nodeA.gridX - nodeB.gridX);
+        int dstY = Math.abs(nodeA.gridY - nodeB.gridY);
+        if (dstX > dstY)
+            return 14 * dstY + 10 * (dstX - dstY);
+        return 14 * dstX + 10 * (dstY - dstX);
+    }
+
+    public void findPath(Node startNode, Node targetNode)
+            throws HeapFullException, HeapEmptyException {
+        Heap<Node> openSet = new Heap<>(width * height); // this where we make use of our heaps
+        Heap<Node> closedSet = new Heap<>(width * height);
+        startNode.hCost = 0;
+        startNode.gCost = 0;
+        openSet.add(startNode);
+
+        while (!openSet.isEmpty()) {
+            Node q = openSet.removeFirst();
+            ArrayList<Node> neighbours = getNeighbours(q);
+            closedSet.add(q);
+            q.inPath = true;
+            if (q.equals(targetNode)) {
+                break;
+            }
+            for (Node x : neighbours) {
+                if (!x.walkable || closedSet.contains(x)) {
+                    neighbours.remove(x);
+                }
+            }
+            for (Node z : neighbours) {
+                if (!openSet.contains(z)) {
+                    openSet.add(z);
+                    z.parent = q;
+                    z.gCost = q.gCost + getDistance(q, z);
+                    z.hCost = getDistance(z, targetNode);
+                } else {
+                    if (q.gCost > z.gCost) {
+                        z.parent = q;
+                        z.gCost = q.gCost + getDistance(q, z);
+                        z.hCost = getDistance(z, targetNode);
+                        openSet.updateItem(z);
+                    }
+                }
+            }
+        }
+    }
+
+    public ArrayList<Node> retracePath(Node startNode, Node endNode) {
+        Node currentNode = endNode;
+        ArrayList<Node> path = new ArrayList<Node>();
+        while (currentNode != startNode && currentNode != null) {
+            currentNode.inPath = true;
+            path.add(currentNode);
+            currentNode = currentNode.parent;
+        }
+        return path;
+    }
+
+    public void move(String direction) {
+        // Direction may be: N,S,W,E,NE,NW,SE,SW
+        // move the boat 1 cell in the required direction
+
+        HashMap<String, int[]> navigation = new HashMap<>();
+
+        navigation.put("N", new int[]{boat.gridY - 1, boat.gridX});
+        navigation.put("E", new int[]{boat.gridY, boat.gridX + 1});
+        navigation.put("S", new int[]{boat.gridY + 1, boat.gridX});
+        navigation.put("W", new int[]{boat.gridY, boat.gridX - 1});
+        navigation.put("NE", new int[]{boat.gridY - 1, boat.gridX + 1});
+        navigation.put("NW", new int[]{boat.gridY - 1, boat.gridX - 1});
+        navigation.put("SE", new int[]{boat.gridY + 1, boat.gridX + 1});
+        navigation.put("SW", new int[]{boat.gridY + 1, boat.gridX - 1});
+
+        int[] movement = navigation.get(direction);
+
+        if (movement[0] >= 0 && movement[1] >= 0 && movement[0] < height && movement[1] < width &&
+                map[movement[0]][movement[1]].walkable) {
+            boat.gridY = movement[0];
+            boat.gridX = movement[1];
+        }
+        System.out.println("Boat Coordinates: (" + boat.gridY + ", " + boat.gridX + ")");
+        System.out.println(drawMap());
+    }
+
+    public Node getTreasure(int range) {
+        // range is the range of the sonar
+        // if the distance of the treasure from the boat is less or equal that the sonar range,
+        // return the treasure node. Otherwise return null.
+
+        if (getDistance(boat, treasure) <= range) {
+            return treasure;
+        } else {
+            return null;
+        }
+    }
+}

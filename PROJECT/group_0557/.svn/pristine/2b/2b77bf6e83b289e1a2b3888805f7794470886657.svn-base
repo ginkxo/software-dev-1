@@ -1,0 +1,37 @@
+package finalproject;
+
+import java.util.HashMap;
+
+public class Administrator extends User {
+    protected int sessionID;
+
+    public Administrator(String username, String password) {
+    	this.userName = username;
+    	this.password = password;
+    }
+
+    public int addProductRequest(Category category, String image, String name, String description, int price) {
+        int newProductID = Store.addProduct(category, image, name, description, price, this.sessionID);
+        return newProductID;
+    }
+
+    public void modifyProductRequest(Product product, Category category, String image, String name, String description, int price) {
+        Store.modifyProduct(product, category, image, name, description, price, this.sessionID);
+    }
+
+    public int addCategoryRequest(String categoryName) {
+        int newCatID = Store.addCategory(categoryName, this.sessionID); //adds to category
+        return newCatID;
+    }
+
+    // Sets the quantity of product at distribution center city to quantity.
+    // If product does not exist, or if city DNE / is not a distribution centre, does nothing.
+    public void modifyQuantityRequest(Product product, City city, int quantity) {
+        Store.modifyQuantity(product, city, quantity, this.sessionID);
+    }
+
+    public HashMap<Integer, Category> listCategories() {
+        return Store.getCategories();
+    }
+}
+

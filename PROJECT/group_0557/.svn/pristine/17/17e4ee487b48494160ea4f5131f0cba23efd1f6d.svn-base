@@ -1,0 +1,93 @@
+package finalproject;
+
+import java.util.HashMap;
+
+public class DBManager {
+	private int NextUserID, NextProductID, NextCategoryID; // max <type>ID parsed + 1 - send these numbers to Store once done parsing.
+	private String CSVpath; // The location of the file we will read and write to	
+
+	// These are just a thought so that we don't have to search for where to add stuff to each time,
+	// But that 'efficient' method would make us more prone to messing up our file so feel free
+	// to delete these if you think they're dangerous / unnecessary.
+	private int CategoryLocation; // The line in the CSV storing the list of categories
+	private int EndofUsers; //The line in the CSV that new users should be inserted at
+	private int EndofProducts; // The line in the CSV that new products should be inserted at
+
+	
+	DBManager(String CSVpath) {
+	this.CSVpath = CSVpath;
+	}
+		
+	// Made some private parse methods below that will be called by the more
+	// encompassing methods parseUsers etc just to break the code up.
+
+	// First some methods for READING from the Database and recreating our information in memory.
+	// Store will have to have a list of Cities and Categories before it can put together
+	// Users and Products respectively.
+
+	/**
+	 * 
+	 * @param line -> a CSV line that contains information pertaining to a single user.
+	 * @return User -> The User object parsed from the CSV information
+	 */	
+	private User parseUser(String line) {
+		//TODO if ... return Administrator(...), else return Shopper(...)
+		// Will likely use constructors like the following to create the user:
+		// public Shopper(String userName, String password, City city, String address, int UserID, HashMap<Product, Integer> cart)
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param line -> a CSV line that contains all information pertaining to a single product.
+	 * @return User -> The Product object parsed from the CSV information
+	 */
+	private Product parseProduct(String line) {
+		//TODO
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param line -> a CSV line that contains all information pertaining to a single product.
+	 * @return User -> The Product object parsed from the CSV information
+	 */
+	private ArrayList<Category> parseCategory(String line) {
+		//TODO
+		return null;
+	}
+	
+	private Graph parseGraph(String line) {
+	// TODO We will need to recreate our graph of cities and connections from the file as well.
+	// Note: Graph just holds an ArrayList of cities, then the connections are stored in the city variables.
+	// So we can put a city on each line and then just make sure our graph knows all of them
+		return null;
+	}
+	
+	// Below here are methods for WRITING purposes. Info is sent from store to update our permanent DB.
+
+	/**
+	 * Updates the stored information about an existing user.
+	 * @param user
+	 */
+	void updateUser(User user) {
+		//TODO 
+	}	
+
+	/**
+	 * Adds a new user to the database.
+	 * @param user
+	 */
+	void addUser(User user) {
+		//TODO Should update and add be seperate? The only benefit is that when we add a new user,
+		// we don't have to look through the entire userlist to see if it already exists. Since Store
+		// will always know which it's doing anyway, then it might make sense to keep these sepearate
+		// Even though updateUser will likely just overwrite the entire User line with a new version of
+		// that user.
+	}
+	
+	//TODO update / add for other types.
+}
+
+	
+}

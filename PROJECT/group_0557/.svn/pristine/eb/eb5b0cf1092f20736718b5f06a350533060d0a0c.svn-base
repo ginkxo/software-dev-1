@@ -1,0 +1,40 @@
+package finalproject;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+public class StoreTester {
+	static Store shop;
+
+	public static void main(String[] args) throws IOException {
+		shop = new Store("testfile.txt");
+		for (Product p : Store.getProductList().values()) {System.out.println(p);}
+
+		@SuppressWarnings("unused")
+		Administrator George = (Administrator) Store.login("George",  "password");
+		Shopper Lynn = (Shopper) Store.login("Lynn", "password");
+
+		HashMap<Integer, Product> products = Store.getProductList();
+		Product q = null;
+		for (Product p : products.values()) 
+			{q = p; break;}
+		System.out.println(Lynn.printCart());
+//		int ID1 = Lynn.checkOut();
+		int ID2 = Lynn.buyItNow(q, 1);
+//		System.out.println(Lynn.getInvoice(ID1));
+		System.out.println(Lynn.getInvoice(ID2));
+//		System.out.println(Lynn.getInvoice(1));
+//		int newProd = George.addProductRequest(Store.getCategory(31000003), "","Pants", "", 12);
+		System.out.println("THE PROD TO MODIFY IS: " + q.getName());
+		System.out.println("CAT 3 IS: " + Store.getCategory(31000003).getName());
+//		George.modifyProductRequest(q, Store.getCategory(31000003), "", "new name", "", 0);
+
+		//		System.out.println("final quants are");
+
+		for (Product p : Store.getProductList().values()) {System.out.println(p);}
+
+		System.out.println(Lynn.printCart());
+
+	}
+}
+	

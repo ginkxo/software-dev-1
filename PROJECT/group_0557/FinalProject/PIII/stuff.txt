@@ -1,0 +1,16 @@
+Categories,,
+Shirts,40000000
+Pants,40000001
+Cities,,
+Toronto,true,<Denver:5000!Halifax:7350!Vancouver:4000>
+Vancouver,false,<Toronto:4000>
+Halifax,false,<Toronto:7350>
+Denver,true,<Toronto:5000>
+Products,,
+40000000,Black_Tshirt.jpg,Black shirt,The darkest of shirts you ever will see,9.95,70000000,<Denver:9000!Toronto:0>
+40000000,Pokemon_Tshirt.jpg,Pokemon Trainer Shirt,PokeGo in style with this very bright shirt!,19.9,70000001,<Denver:0!Toronto:400>
+40000001,Pants.jpg,Pants,In case you don't own pants.,28.5,70000002,<Denver:100!Toronto:0>
+Users,,
+true,George,password,10102142
+true,g,p,10102143
+Invoices,,

@@ -1,0 +1,22 @@
+Categories,,
+Shirts,31000000
+Pants,31000001
+Hats,31000002
+Cities,,
+Alabama,true
+Toronto,true
+Mexico,false,<Alabama:501!Toronto:97>
+Products,,
+31000002,Cap.jpg,Shirt-A-Flo,This is a groovy AF shirt,12.5,71000000,<Toronto:995>
+31000001,Pants.jpg,Shirt-A-Blo,,12.5,51000000,<Toronto:10963!Alabama:80>
+31000001,Blue_Shorts.jpg,blue bottoms,I Hate This,99999.0,71000002,<Toronto:20!Alabama:0>
+Users,,
+false,Lynn,password,Mexico,92 What's it road,10000001,<71000002:1>
+true,George,password,10102142
+Invoices,,
+1,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&!71000000:&5.0#12.5&>
+2,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+3,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+4,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+511,Lynn,0.0,<Toronto!Mexico>,<51000000:&1.0#12.5&>
+512,Lynn,0.97,<Toronto!Mexico>,<51000000:&5.0#12.5&>

@@ -1,0 +1,92 @@
+MEETINGS
+================================
+PLANNING MEETING (Work session after)
+Date and time: 22 Jul 2016, 11:00
+Location: Bahen Centre
+In Attendance: Everyone
+Current state of the project:
+	-Updated CRCs
+	-Figured out Project.java with some questions, which were asked on Piazza.
+	-Completed basic structure of Invoice, Product, and Shopper classes
+	-Work divided
+	-Barebones structure of Store.java completed
+Tasks for this week:
+	-Complete Store and DBManager classes (Greg and Tanuj)
+	-Complete User-Admin-Shopper-Product-Category-Invoice Suite (George and Lynn)
+	-Figure out GraphBuilder
+
+===============================
+STATUS MEETING
+Date and time: 27 Jul 2016, 13:00
+Location: Facebook chat
+George + Lynn:
+	-Completed majority of implementation of assigned classes.
+	-Started on Project.java
+	-Will complete Invoice.java, Project.java
+	-Will test Store functionality and make modifications as necessary
+Tanuj and Greg:
+	-Completed majority of Store and DBManager implementation.
+	-Will complete write methods for DBManager.
+	-Will update CRC cards
+
+===============================
+PLANNING MEETING
+Date and time: 28 Jul 2016, 8:45
+Location: Facebook chat
+Current state of the project:
+	-Basic functionality of back-end works
+	-Few minor kinks in code / missing methods need to be ironed out
+Tasks for today:
+	-Iron out write methods in DBManager (Tanuj/Greg)
+	-Fix up Invoice and invoice related storage/creation in Shopper/Store (George/Lynn)
+	-Finish Project.java methods and rigorously test (George/Lynn)
+	-Update CRC cards if necessary (Anyone/Everyone)
+	-Review/Update Javadoc comments in respective classes (Everyone)
+
+
+
+===============================
+PLANNING MEETING
+
+Date and time: 1 Aug 2016, 15:30
+
+Location: Bahen Centre
+
+Current state of the project:
+
+	-Backend mostly implemented
+
+	-Front end template created 
+
+Tasks for the week:
+
+	-Tanuj - Implement invoice functionality in CSV, operations for commas
+
+	-Backend search implementation 
+	-GUI cart template/display
+
+	-GUI cart backend connection
+
+	-GUI for products
+
+	-Overall GUI functionality
+
+	-Implementation of allowing a change of a non-distributing city to a distributing city
+
+	-General work division: Greg/Lynn frontend; Tanuj/George backend
+
+
+
+================================
+STATUS MEETING
+Date and time: 4 Aug 20116, 16:00
+Location: Online
+Lynn + Greg:
+	- Front end fully functional
+	- Withstood all attempts to break it
+	- Can add minor quality of life features if time permits
+George + Tanuj:
+	- GUI communicates flawlessly with back-end.
+	- Data persists through instances.
+	- ProjectV1.java tests ran successfully.
+	- Added extra files to ensure the successful running of automated tests.

@@ -1,0 +1,40 @@
+Final Project Phase I feedback
+==============================
+CRC model - five of your CRC cards were evaluated with up to 2 points for each CRD card as follows:
+	2 points for a correct CRC card
+	1 point for an incorrect CRC card
+	0 points if not enough CRC cards present, crc file unreadable or missing
+
+Below is the list of your crc cars and the points earned for each
+
+Points	CRC card name
+------	-----------------------------------
+2	user
+2	store
+2	Administrator
+2	shopper
+2	invoice
+
+
+Data Structured and files used - five of your classes were evaluated as follows:
+	2 points for a correct class, data structure and file
+	1 point for an incorrect/partial description of class, data structure, or file
+	0 points if not enough classes present, crc file unreadable or missing
+
+Below is the list of your classes/data structures/files and the points earned for each
+
+Points	Name
+------	-----------------------------------
+2	hashmap
+2	array list
+1	user/product.csv
+0	no file
+0	no more DS or files
+
+Designated walkthrough evaluation communicated to you by your TA: 8 points.
+
+TA choice walkthrough evaluation: 5 points.
+
+Working code evalued during TA meeting: 4 points.
+
+TOTAL POINTS: 32/40

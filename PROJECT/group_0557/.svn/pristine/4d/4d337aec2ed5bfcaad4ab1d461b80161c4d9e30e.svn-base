@@ -1,0 +1,28 @@
+**Data Structures**
+
+*STORE*
+
+userList: HashMap<int, User>
+The userList in the Store class is a collection of all the Users currently stored on the Store instance. The userList serves as the class attribute for reading from and writing to the CSV file that acts as the local database for the users and products. A HashMap is a type of hash table/map data structure that associates unique keys with objects. Because each User has a unique ID integer, the Users can be grouped based on using these ID integers as keys. Appropriately, the Users can be written to and read from the CSV database file using the ID keys. Dynamic ArrayLists are not as easily accessible by ID, and normal arrays are static in size. 
+
+productList: HashMap<int, Product>
+Similar to the userList, the productList is a comprehensive list of all possible products available for sale in the store. Again, since each product has its own unique ID, a HashMap can use the unique IDs as keys to store and manipulate the products, as necessary, between the classes and the CSV database file. Again, this allows easier/quicker access to the items, based on ID lookup. Again, dynamic ArrayLists are not as easily accessible by ID, and normal arrays are static in size. 
+
+In both situations, tree structures are unnecessary because there is only a one-to-one data relation between IDs and products/users. Although categories might exist, these groupings do not need to influence the particular data structure.
+
+reservedWords: ArrayList<String>
+The list of reserved words only necessitates a simple, dynamic ArrayList that accomodates the change of possible reserved words in the future. Normal arrays are again static so cannot expand to accomodate certain sizes. 
+
+*SHOPPER*
+
+invoices: ArrayList<Invoice>
+A shopper has a collection of invoices that are essentially independent of each other, and the shopper constantly receives more invoices. For this reason, an ArrayList is appropriate due to its dynamic expansion capabilities. The independence of each invoices render trees or maps redundant/unnecessary and static arrays would have trouble accomodating extra additions beyond their pre-set sizes.
+
+*INVOICE*
+
+items: ArrayList<Product, int, int>
+A single invoice will contain an attribute, "items", that stores 3-tuples consiting of the product, the quantity of product purchased, and the price of the purchase. In this scenario (and as with most online shopping), shopping carts will be infinitely-sized, so 3-tuple ArrayLists provide the dynamic size expansion necessary. 
+
+**CSV Structure**
+
+The CSV will contain products and users, both of which will be denoted by ID values based on their respective HashMaps. The first column value will be reserved for the type (User, Product) followed by the respective ID, and then the remaining sections will be dedicated to properties of each individual User or Product object, including name strings, user invoice contents (corresponding to product IDs), and so on.
